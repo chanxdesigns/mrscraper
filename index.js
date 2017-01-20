@@ -9,16 +9,18 @@
 
 var express = require('express'),
     winston = require('winston'),
-    scraper = require('./src/scraper');
+    scraper = require('./src/scraper'),
+    Q = require('q');
 
 // Initialize Express
 var app = express();
 
 // App Routes
-app.get('/:directory', function (req, res) {
-    var n = scraper.extractEmail(req.params.directory);
-    console.log(n);
-    res.send(n);
+app.get('/:directory/extract-email', function (req, res) {
+    scraper.extract(req.params.directory)
+        .then(function (d) {
+            res.send(d);
+        })
 });
 
 app.get('/', function (req, res) {
