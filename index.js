@@ -9,22 +9,16 @@
 
 var express = require('express'),
     winston = require('winston'),
-    scraper = require('./src/scraper'),
-    Q = require('q');
+    scraper = require('./src/esomar_scarper');
 
 // Initialize Express
 var app = express();
 
 // App Routes
 app.get('/:directory/extract-email', function (req, res) {
-    scraper.extract(req.params.directory)
-        .then(function (d) {
-            res.send(d);
-        })
-});
-
-app.get('/', function (req, res) {
-    return "Test";
+    scraper.extract(req.params.directory).then(function (data) {
+        res.send(data);
+    });
 });
 
 app.listen(8000,function () {

@@ -30,11 +30,47 @@ var getDirectory = function (directoryName) {
 };
 
 var scrapCompanies = function (data) {
-    var companies = [],
-        deferred = Q.defer();
+    var deferred = Q.defer(),
+        $ = cheerio.load(data),
+        dom = $('h2.mb0');
+
+    var companies = [];
+    for (var i = 0; i < dom.length; i++) {
+        var company_name = $(dom[i]).find('a').text(),
+            company_esomar_url = $(dom[i]).find('a').attr('href');
+
+        https.get(company_esomar_url,
+            function (res) {
+                var data;
+                res.on('data', function (chunk) {
+                    data += chunk;
+                });
+                res.on('end', function () {
+                    if (data) {
+                        var $ = cheerio.load(data),
+                            dom = $('a[data-ga-category="website"]');
+
+                        companies.push({company_name: company_name, company_url: dom.attr('href')});
+                    }
+                });
+            })
+            .on('error', function (err) {
+                throw new Error(err);
+            })
+            .end();
+    }
+
+    companies.length ? deferred.resolve(companies) : deferred.reject(err);
+    return deferred.promise;
+};
+
+var navigateAndFetchPages = function (data) {
+    var deferred = Q.defer();
+
     for (var i = 0; i < data.length; i++) {
 
-        var host = data[i].esomar_url.split('/')[0],
+        var country = data[i].country_name.split('(')[0].trim(),
+            host = data[i].esomar_url.split('/')[0],
             path = '/'+data[i].esomar_url.split('/')[1]+'/';
 
         https.request({
@@ -53,9 +89,29 @@ var scrapCompanies = function (data) {
                 // Start scraping company names and Esomar url
                 // Once the Dom is ready
                 var $ = cheerio.load(data),
-                    dom = $('.mb0');
+                    dom = $('.mt0.mb0-5.pt0').find('a').not('.active');
 
-                console.log(dom.length, path)
+                for (var i = 0; i < dom.length; i++) {
+                    //console.log($(dom[i]).attr('href'));
+                    if ($(dom[i]).attr('href') !== undefined) {
+
+                        https.get($(dom[i]).attr('href'),
+                        function (res) {
+                            var data = '';
+                            res.on('data', function (chunk) {
+                                data += chunk;
+                            });
+                            res.on('end', function () {
+                                deferred.resolve(scrapCompanies(data));
+                            });
+                        })
+                            .on('error', function (err) {
+                               deferred.reject(err);
+                            })
+                            .end();
+
+                    }
+                }
             })
         })
             .on('error', function (err) {
@@ -67,7 +123,7 @@ var scrapCompanies = function (data) {
     return deferred.promise;
 };
 
-var scrapLanding = function (data, host) {
+var landing = function (data, host) {
     var countries = {
             europe: [],
             asia: [],
@@ -78,7 +134,8 @@ var scrapLanding = function (data, host) {
         var $ = cheerio.load(data),
             cn_europe = $('#location_europe .list-countries li'),
             cn_asia = $('#content-location_asia_pacific li'),
-            cn_north_america = $('#content-location_north_america li');
+            cn_north_america = $('#content-location_north_america li'),
+            deferred = Q.defer();
 
         // Get Europe Company List
         var europe = [];
@@ -90,7 +147,7 @@ var scrapLanding = function (data, host) {
             europe.push({country_name: country_name, esomar_url: esomar_url});
         }
 
-        scrapCompanies(europe);
+        navigateAndFetchPages(europe)
 
         //return def.promise;
 
@@ -118,7 +175,7 @@ var scraper = {
                 res.on('end', function () {
                     // On successfully data receive
                     // Run the scrapLanding page and defer the results
-                    deferred.resolve(scrapLanding(data, result.url));
+                    deferred.resolve(landing(data, result.url));
                 });
             })
                 .on('error', function (err) {
