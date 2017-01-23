@@ -1,17 +1,12 @@
 
 var Rq = require('request-promise'),
     cheerio = require('cheerio'),
-    Q = require('q');
+    Q = require('q'),
+    Uni = require('unirest');
 
 var directories = [{dir: "esomar", url: "directory.esomar.org", https: true}];
 
-/**
- * Get Individual Directory
- *
- * @param directoryName
- * @returns {*}
- */
-function getDirectory (directoryName) {
+var getDirectory = function (directoryName) {
     try {
         // If directory not specified by the user
         if (directoryName === undefined) throw 404;
@@ -33,46 +28,9 @@ function getDirectory (directoryName) {
     catch (err) {
         return err;
     }
-}
+};
 
-function scrapCompanies(countriesLinks) {
-    return countriesLinks.map(function (countryLinks) {
-        return countryLinks.esomar_links.map(function (link) {
-            return Rq(link)
-                .then(function (data) {
-                    return data;
-                });
-        })
-    })
-}
-
-function navigateAndFetchPages (data) {
-        return data.map(function (val) {
-            return Rq(val.esomar_url)
-                .then(function (data) {
-                    var $ = cheerio.load(data),
-                        pages_elem = $('.mt0.mb0-5.pt0').find('a').not('.active');
-
-                        var links = [];
-                        for (var i = 0; i < pages_elem.length; i++) {
-                            links.push($(pages_elem[i]).attr('href'));
-                        }
-
-                    return {
-                        country_name: val.country_name,
-                        esomar_links: links
-                    };
-                })
-        });
-}
-
-/***
- * Landing Page Scraping Function
- *
- * @param dir
- * @returns {*}
- */
-function landingPage (dir) {
+var landingPage = function (dir) {
     return Rq('https://'+getDirectory(dir).url)
         .then(function (data) {
             if (data) {
@@ -89,22 +47,17 @@ function landingPage (dir) {
                         esomar_url = 'https://' + getDirectory(dir).url + '/' + $(cn_europe[i]).find('a').attr('href');
                     europe.push({country_name: country_name, esomar_url: esomar_url});
                 }
+
+                //console.log(europe.length !== undefined ? "yooo" : "noo");
                 return europe;
             }
         })
-}
+};
 
 var scraper = {
     extract: function (dir) {
-        return landingPage(dir)
-            .then(function (countries) {
-                return Promise.all(navigateAndFetchPages(countries));
-            })
-            .then(function (countriesLinks) {
-                return Promise.all(scrapCompanies(countriesLinks));
-            })
-            .catch();
+
     }
-};
+}
 
 module.exports = scraper;
