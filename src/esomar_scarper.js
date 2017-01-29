@@ -1,7 +1,8 @@
 
 var Rq = require('request-promise'),
     cheerio = require('cheerio'),
-    Q = require('q');
+    Q = require('q'),
+    https = require('https');
 
 var directories = [{dir: "esomar", url: "directory.esomar.org", https: true}];
 
@@ -35,35 +36,96 @@ function getDirectory (directoryName) {
     }
 }
 
-function scrapCompanies(countriesLinks) {
+function scrapComp (normalizedLinkArr) {
+    var m = [];
+    normalizedLinkArr.forEach(function (item, index) {
+        item.forEach(function (i) {
+            m.push(i);
+        })
+    })
+
+    return m.map(function (n) {
+        console.log(n.es_links);
+        return Rq(n.es_links)
+            .then(function (data) {
+                return data;
+            })
+    })
+}
+
+function scrapCompanies (countriesLinks) {
     return countriesLinks.map(function (countryLinks) {
         return countryLinks.esomar_links.map(function (link) {
-            return Rq(link)
-                .then(function (data) {
-                    return data;
-                });
-        })
+            return {comp_name: countryLinks.country_name, es_links: link};
+            // Rq(link)
+            //     .then(function (data) {
+            //         return data;
+            //     })
+            // return Rq(link)
+            //     .then(function (data) {
+            //         var $ = cheerio.load(data),
+            //             companies_det = $('h2.mb0');
+            //
+            //         console.log(companies_det);
+            //
+            //         return companies_det;
+            //
+            //         // return companies_det.map(function (index,company_det) {
+            //         //     //var $ = cheerio.load(company_det);
+            //         //     var company_name = $(company_det).find('a').text(),
+            //         //         company_esomar_url = $(company_det).find('a').attr('href');
+            //         //
+            //         //     return Rq(company_esomar_url)
+            //         //         .then(function (web_data) {
+            //         //             var $ = cheerio.load(web_data);
+            //         //             return {
+            //         //                 company_name: company_name,
+            //         //                 company_url: $('a[data-ga-category="website"]').attr('href')
+            //         //             }
+            //         //         })
+            //         //         .catch(function (err) {
+            //         //             return err;
+            //         //         })
+            //         // });
+            //     })
+            //     .catch(function (err) {
+            //         return err;
+            //     })
+        });
+        // return countryLinks.esomar_links.map(function (link) {
+        //     var linkArr = link.split('/');
+        //     var options = {
+        //         baseUrl: 'https://'+linkArr[2],
+        //         uri: linkArr[3],
+        //         timeout: 180000
+        //     };
+        //     return Rq(options)
+        //         .then(function (d) {
+        //             return d;
+        //         });
+        // });
+
     })
 }
 
 function navigateAndFetchPages (data) {
-        return data.map(function (val) {
-            return Rq(val.esomar_url)
-                .then(function (data) {
-                    var $ = cheerio.load(data),
-                        pages_elem = $('.mt0.mb0-5.pt0').find('a').not('.active');
+    return data.map(function (val) {
+        return Rq(val.esomar_url)
+            .then(function (data) {
+                var $ = cheerio.load(data),
+                    pages_elem = $('.mt0.mb0-5.pt0').find('a').not('.active');
 
-                        var links = [];
-                        for (var i = 0; i < pages_elem.length; i++) {
-                            links.push($(pages_elem[i]).attr('href'));
-                        }
+                var links = [];
+                for (var i = 0; i < pages_elem.length; i++) {
+                    links.push($(pages_elem[i]).attr('href'));
+                }
 
-                    return {
-                        country_name: val.country_name,
-                        esomar_links: links
-                    };
-                })
-        });
+                return {
+                    country_name: val.country_name,
+                    esomar_links: links
+                };
+            })
+    });
 }
 
 /***
@@ -102,6 +164,9 @@ var scraper = {
             })
             .then(function (countriesLinks) {
                 return Promise.all(scrapCompanies(countriesLinks));
+            })
+            .then(function(normalizedLinkArray) {
+                return scrapComp(normalizedLinkArray);
             })
             .catch();
     }
