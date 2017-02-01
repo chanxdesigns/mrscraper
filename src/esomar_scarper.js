@@ -42,15 +42,11 @@ function scrapComp (normalizedLinkArr) {
         item.forEach(function (i) {
             m.push(i);
         })
-    })
+    });
 
-    return m.map(function (n) {
-        console.log(n.es_links);
-        return Rq(n.es_links)
-            .then(function (data) {
-                return data;
-            })
-    })
+    return m.forEach(function (n) {
+        return Rq('https://www.google.in')
+    });
 }
 
 function scrapCompanies (countriesLinks) {
@@ -108,26 +104,6 @@ function scrapCompanies (countriesLinks) {
     })
 }
 
-function navigateAndFetchPages (data) {
-    return data.map(function (val) {
-        return Rq(val.esomar_url)
-            .then(function (data) {
-                var $ = cheerio.load(data),
-                    pages_elem = $('.mt0.mb0-5.pt0').find('a').not('.active');
-
-                var links = [];
-                for (var i = 0; i < pages_elem.length; i++) {
-                    links.push($(pages_elem[i]).attr('href'));
-                }
-
-                return {
-                    country_name: val.country_name,
-                    esomar_links: links
-                };
-            })
-    });
-}
-
 /***
  * Landing Page Scraping Function
  *
@@ -166,7 +142,7 @@ var scraper = {
                 return Promise.all(scrapCompanies(countriesLinks));
             })
             .then(function(normalizedLinkArray) {
-                return scrapComp(normalizedLinkArray);
+                scrapComp(normalizedLinkArray);
             })
             .catch();
     }
