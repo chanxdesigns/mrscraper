@@ -76,9 +76,7 @@ function extractCompanies (dir, callback) {
                 });
             }
 
-            // Initiate Database Connection
-            DB.makeDbConn();
-
+            var counter = companies.length;
             companies.forEach(function (val) {
                 request(val.esomar_url, function (err, res, body) {
                     var $ = cheerio.load(body),
@@ -107,7 +105,7 @@ function extractCompanies (dir, callback) {
                                                     country: val.country_name,
                                                     directory: getDirectory(dir).dirname,
                                                     company_name: $('h1.uppercase.mb0').text().trim(),
-                                                    company_url: $('a[data-ga-category="website"]').attr('href') !== undefined ? $('a[data-ga-category="website"]').attr('href') : "Website Not Exists"
+                                                    company_url: $('a[data-ga-category="website"]').attr('href') !== undefined ? $('a[data-ga-category="website"]').attr('href') : 404
                                                 });
 
                                                 company.save(function (err, res) {
@@ -120,18 +118,53 @@ function extractCompanies (dir, callback) {
                                 }
                             }
                         })
-                    })
+                    });
+                    --counter;
+                    //if (!counter) callback("Extracting Completed.");
                 });
             });
-
             callback("Extracting Data, Please Wait");
-
         }
     });
 }
 
+function extractEmail (dir, callback) {
+    var Companies = mongoose.model('Companies', DB.companySchema),
+        EmailCollection = mongoose.model('CompaniesEmail', DB.companyEmailSchema),
+        query = Companies.find({});
+
+    query.exec(function (err, companies) {
+        var counter = companies.length;
+        console.log('Total '+counter)
+        companies.forEach(function (company) {
+            if (company.company_url !== 404) {
+                // var queryUri = 'https://api.hunter.io/v2/domain-search?domain='+company.company_url+'&api_key=26d5415191770bbeb981e72cd965cf457e37d379';
+                // request(queryUri, function (err, res) {
+                //     if (err) console.log(err);
+                //     var Email = new EmailCollection({
+                //         country: company.country,
+                //         company_name: company.company_name,
+                //         company_url: company.company_url,
+                //         emails: res.data.emails.map(function (email) {
+                //             return email.confidence > 40 ? email.value : false;
+                //         })
+                //     });
+                //     Email.save(function (err) {
+                //         if (err) console.log('Saving Error');
+                //     });
+                     --counter;
+                // })
+            }
+            else {
+                --counter;
+            }
+            console.log(counter, company.company_url);
+            if (!counter) callback('Email Extraction Completed.');
+        })
+    })
+}
+
 function getCompanies(dir,callback) {
-    DB.makeDbConn();
     var Companies = mongoose.model('Companies', DB.companySchema);
     var query = Companies.find({});
     query.exec(function (err, companies) {
@@ -143,13 +176,17 @@ function getCompanies(dir,callback) {
     })
 }
 
+// Initiate Database Connection
+DB.makeDbConn();
+
 var scraper = {
     extract: function (dir, callback) {
         extractCompanies(dir, function (data) {
             callback(data);
         })
     },
-    getCompanies: getCompanies
+    getCompanies: getCompanies,
+    extractEmail: extractEmail
 };
 
 module.exports = scraper;

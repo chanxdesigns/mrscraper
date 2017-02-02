@@ -22,6 +22,12 @@ app.get('/:directory/extract-companies', function (req, res) {
     });
 });
 
+app.get('/:directory/extract-email', function (req, res) {
+    scraper.extractEmail(req.params.directory,function (data) {
+        res.send(data);
+    })
+});
+
 app.get('/get-companies', function (req, res) {
     scraper.getCompanies('',function (companies) {
         res.send(companies);
