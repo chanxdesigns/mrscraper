@@ -135,32 +135,69 @@ function extractEmail (dir, callback) {
 
     query.exec(function (err, companies) {
         var counter = companies.length;
-        console.log('Total '+counter)
         companies.forEach(function (company) {
-            if (company.company_url !== 404) {
-                // var queryUri = 'https://api.hunter.io/v2/domain-search?domain='+company.company_url+'&api_key=26d5415191770bbeb981e72cd965cf457e37d379';
-                // request(queryUri, function (err, res) {
-                //     if (err) console.log(err);
-                //     var Email = new EmailCollection({
-                //         country: company.country,
-                //         company_name: company.company_name,
-                //         company_url: company.company_url,
-                //         emails: res.data.emails.map(function (email) {
-                //             return email.confidence > 40 ? email.value : false;
-                //         })
-                //     });
-                //     Email.save(function (err) {
-                //         if (err) console.log('Saving Error');
-                //     });
-                     --counter;
-                // })
-            }
-            else {
-                --counter;
-            }
-            console.log(counter, company.company_url);
-            if (!counter) callback('Email Extraction Completed.');
-        })
+            var queryUri = 'https://api.hunter.io/v2/domain-search?domain='+ company.company_url +'&api_key=26d5415191770bbeb981e72cd965cf457e37d379';
+            request(queryUri, function (err, res, body) {
+                if (err) console.log(err);
+                var hunterObj = JSON.parse(body);
+                if (hunterObj.data.emails.length !== 0) {
+                    var offset = 0;
+                    function getMoreEmail () {
+                        //if (offset >= hunterObj.meta.results) return false;
+                        //if (EmailCollection.findOne({country: company.country, company_url: company.company_url})) {
+                        console.log(offset);
+                        if (hunterObj.meta.results > 10) {
+                            var url = offset >= 10 ? queryUri+'&offset='+offset : queryUri;
+                        }
+                        else {
+                            url = queryUri;
+                        }
+                            request(url, function (err, res, body) {
+                                if (err) console.log(err);
+                                var moreMail = JSON.parse(body);
+                                EmailCollection.findOneAndUpdate(
+                                    {
+                                        company_url: company.company_url
+                                    },
+                                    {
+                                        country: company.country,
+                                        company_name: company.company_name,
+                                        directory: company.directory,
+                                        $addToSet: {
+                                            emails: {
+                                                $each: moreMail.data.emails.map(function (email) {
+                                                    if (email.confidence > 40) return email.value;
+                                                })
+                                            }
+                                        },
+                                        first_name: moreMail.data.emails.forEach(function (email) {
+                                            return email.first_name;
+                                        })
+                                    },
+                                    {
+                                        new: true,
+                                        upsert: true
+                                    }, function (err, res, a) {
+                                        if (err) console.log(err);
+                                        else {
+                                            offset += 10;
+                                            if (hunterObj.meta.results > 10 && offset < hunterObj.meta.results) getMoreEmail();
+                                        }
+                                    });
+                            });
+                        //}
+                    }
+                    getMoreEmail();
+                    --counter;
+                    if (!counter) callback('Extraction Completed!');
+                }
+                else {
+                    console.log("No Email");
+                    --counter;
+                    if (!counter) callback('Extraction Completed!');
+                }
+            });
+        });
     })
 }
 

@@ -12,6 +12,7 @@ var DB = {
 
     companyEmailSchema: new Schema({
         country: String,
+        directory: String,
         company_name: String,
         company_url: String,
         emails: Array,

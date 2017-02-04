@@ -9,7 +9,8 @@
 
 var express = require('express'),
     winston = require('winston'),
-    scraper = require('./src/esomar_scraper');
+    scraper = require('./src/esomar_scraper'),
+    csv = require('./src/csv_maker');
 
 // Initialize Express
 var app = express();
@@ -31,6 +32,12 @@ app.get('/:directory/extract-email', function (req, res) {
 app.get('/get-companies', function (req, res) {
     scraper.getCompanies('',function (companies) {
         res.send(companies);
+    })
+});
+
+app.get('/download', function (req, res) {
+    csv(function (email) {
+        res.send(email);
     })
 });
 
