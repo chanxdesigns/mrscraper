@@ -177,7 +177,7 @@ function extractEmail (dir, callback) {
                                     {
                                         new: true,
                                         upsert: true
-                                    }, function (err, res, a) {
+                                    }, function (err) {
                                         if (err) console.log(err);
                                         else {
                                             offset += 10;

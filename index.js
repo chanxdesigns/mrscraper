@@ -36,8 +36,8 @@ app.get('/get-companies', function (req, res) {
 });
 
 app.get('/download', function (req, res) {
-    csv(function (email) {
-        res.send(email);
+    csv(function (file_url, file_name) {
+        //res.download(file_url);
     })
 });
 
