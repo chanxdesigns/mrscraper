@@ -36,8 +36,9 @@ app.get('/get-companies', function (req, res) {
 });
 
 app.get('/download', function (req, res) {
-    csv(function (file_url, file_name) {
-        //res.download(file_url);
+    csv(function (file_url) {
+        var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="'+file_url+'">Download</a>';
+        res.send(html);
     })
 });
 

@@ -2,8 +2,13 @@ var json2csv = require('json2csv'),
     DB = require('./dbconn'),
     mongoose = require('mongoose'),
     fs = require('fs'),
-    s3 = require('s3');
+    AWS = require('aws-sdk');
 
+/**
+ * Generate CSV file
+ *
+ * @param callback
+ */
 function generate (callback) {
     var EmailCollection = mongoose.model('CompaniesEmail', DB.companyEmailSchema);
     var emails = EmailCollection.find({});
@@ -16,35 +21,27 @@ function generate (callback) {
             var date = Date.now();
             fs.writeFile('files/emails_'+ date +'.csv', csv, function(err) {
                 if (err) throw err;
-                console.log('File saved Locally');
-                var client = s3.createClient({
-                    s3Options: {
-                        accessKeyId: "AKIAJFBO2N5FZEARJXYA",
-                        secretAccessKey: "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",
-                        region: 'ap-south-1'
-                    }
-                });
-                var params = {
-                    localFile: 'files/emails_'+ date +'.csv',
-
-                    s3Params: {
-                        Bucket: "mrscraper",
-                        Key: 'files/emails_'+ date +'.csv',
-                        ACL: 'public-read'
-                    }
+                //console.log('File saved Locally');
+                var clientOptions = {
+                    accessKeyId: "AKIAJFBO2N5FZEARJXYA",
+                    secretAccessKey: "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",
+                    region: 'ap-south-1'
                 };
-                var uploader = client.uploadFile(params);
-                uploader.on('error', function(err) {
-                    console.error("unable to upload:", err.stack);
+                var s3 = new AWS.S3(clientOptions);
+
+                var params = {
+                    Bucket: 'mrscraper',
+                    Key: 'files/emails_'+ date +'.csv',
+                    Body: fs.readFileSync('files/emails_'+ date +'.csv'),
+                    ACL: 'public-read'
+                };
+
+                // Upload file to S3
+                s3.putObject(params, function (err) {
+                    if (err) throw err;
+                    fs.unlink('files/emails_'+ date +'.csv');
+                    callback('https://s3.ap-south-1.amazonaws.com/mrscraper/files/emails_'+ date +'.csv');
                 });
-                uploader.on('progress', function() {
-                    console.log("progress", uploader.progressMd5Amount,
-                        uploader.progressAmount, uploader.progressTotal);
-                });
-                uploader.on('end', function(data) {
-                    console.log(data, "Done uploading");
-                });
-                //callback('files/emails_'+ date +'.csv', 'emails_'+ date +'.csv');
             });
         }
     })
