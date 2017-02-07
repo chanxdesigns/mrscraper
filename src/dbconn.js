@@ -19,6 +19,11 @@ var DB = {
         created_time: {type: Date, default: Date.now}
     }),
 
+    apiKeySchema: new Schema({
+        key: String,
+        usage: Boolean
+    }),
+
     makeDbConn: function () {
         var uri = "mongodb://127.0.0.1:27017";
 

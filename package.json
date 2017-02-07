@@ -10,10 +10,12 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.9.0",
+    "body-parser": "^1.16.0",
     "cheerio": "^0.22.0",
     "express": "^4.14.0",
     "json2csv": "^3.7.3",
     "mongoose": "^4.8.1",
+    "pug": "^0.1.0",
     "q": "^1.4.1",
     "request": "^2.79.0",
     "request-promise": "^4.1.1",

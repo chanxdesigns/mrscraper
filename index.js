@@ -8,12 +8,21 @@
 'use strict';
 
 var express = require('express'),
+    bodyParser = require('body-parser'),
     winston = require('winston'),
     scraper = require('./src/esomar_scraper'),
-    csv = require('./src/csv_maker');
+    csv = require('./src/csv_maker'),
+    api_keys = require('./src/api_keys');
 
 // Initialize Express
 var app = express();
+
+// Set Local App Variables
+app.set('views', './views');
+app.set('view engine', 'pug');
+
+// Post Body Parser
+app.use(bodyParser.urlencoded({extended: true}));
 
 // App Routes
 app.get('/:directory/extract-companies', function (req, res) {
@@ -33,6 +42,16 @@ app.get('/get-companies', function (req, res) {
     scraper.getCompanies('',function (companies) {
         res.send(companies);
     })
+});
+
+app.get('/api-keys', function (req, res) {
+    res.render('api-key-form');
+});
+
+app.post('/submit', function (req, res) {
+    api_keys.insert(req.body.api_keys, function (data) {
+        res.send(data);
+    });
 });
 
 app.get('/download', function (req, res) {

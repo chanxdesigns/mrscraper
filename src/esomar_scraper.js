@@ -131,72 +131,101 @@ function extractCompanies (dir, callback) {
 function extractEmail (dir, callback) {
     var Companies = mongoose.model('Companies', DB.companySchema),
         EmailCollection = mongoose.model('CompaniesEmail', DB.companyEmailSchema),
-        query = Companies.find({});
+        Api = mongoose.model('ApiKeys', DB.apiKeySchema),
+        CompaniesQuery = Companies.find({});
 
-    query.exec(function (err, companies) {
+    CompaniesQuery.exec(function (err, companies) {
         var counter = companies.length;
         companies.forEach(function (company) {
-            var queryUri = 'https://api.hunter.io/v2/domain-search?domain='+ company.company_url +'&api_key=26d5415191770bbeb981e72cd965cf457e37d379';
-            request(queryUri, function (err, res, body) {
-                if (err) console.log(err);
-                var hunterObj = JSON.parse(body);
-                if (hunterObj.data.emails.length !== 0) {
-                    var offset = 0;
-                    function getMoreEmail () {
-                        //if (offset >= hunterObj.meta.results) return false;
-                        //if (EmailCollection.findOne({country: company.country, company_url: company.company_url})) {
-                        console.log(offset);
-                        if (hunterObj.meta.results > 10) {
-                            var url = offset >= 10 ? queryUri+'&offset='+offset : queryUri;
+            var queryUri;
+            function getKey () {
+                var apikey = Api.findOne({'usage': true});
+                apikey.exec(function (err, apikey) {
+                    //console.log(apikey.key);//
+                    queryUri = 'https://api.hunter.io/v2/domain-search?domain='+ company.company_url +'&api_key='+apikey.key;
+                    console.log(queryUri);
+                    request(queryUri, function (err, res, body) {
+                        if (err) throw err;
+                        var hunterObj = JSON.parse(body);
+                        console.log(hunterObj);
+                        if (hunterObj.errors) {
+                            Api.findOneAndUpdate(
+                                {
+                                    key: apikey.key
+                                },
+                                {
+                                    usage: false
+                                },
+                                function (err) {
+                                    if (err) throw err;
+                                    console.log('I\'m executed');
+                                    console.log('API KEY UPDATED');
+                                    getKey();
+                                }
+                            );
                         }
                         else {
-                            url = queryUri;
-                        }
-                            request(url, function (err, res, body) {
-                                if (err) console.log(err);
-                                var moreMail = JSON.parse(body);
-                                EmailCollection.findOneAndUpdate(
-                                    {
-                                        company_url: company.company_url
-                                    },
-                                    {
-                                        country: company.country,
-                                        company_name: company.company_name,
-                                        directory: company.directory,
-                                        $addToSet: {
-                                            emails: {
-                                                $each: moreMail.data.emails.map(function (email) {
-                                                    if (email.confidence > 40) return email.value;
-                                                })
-                                            }
-                                        },
-                                        first_name: moreMail.data.emails.forEach(function (email) {
-                                            return email.first_name;
-                                        })
-                                    },
-                                    {
-                                        new: true,
-                                        upsert: true
-                                    }, function (err) {
+                            if (hunterObj.data.emails.length !== 0) {
+                                console.log('Coming Here');
+                                var offset = 0;
+                                function getMoreEmail () {
+                                    //if (offset >= hunterObj.meta.results) return false;
+                                    //if (EmailCollection.findOne({country: company.country, company_url: company.company_url})) {
+                                    if (hunterObj.meta.results > 10) {
+                                        var url = offset >= 10 ? queryUri+'&offset='+offset : queryUri;
+                                    }
+                                    else {
+                                        url = queryUri;
+                                    }
+                                    request(url, function (err, res, body) {
                                         if (err) console.log(err);
-                                        else {
-                                            offset += 10;
-                                            if (hunterObj.meta.results > 10 && offset < hunterObj.meta.results) getMoreEmail();
-                                        }
+                                        var moreMail = JSON.parse(body);
+                                        EmailCollection.findOneAndUpdate(
+                                            {
+                                                company_url: company.company_url
+                                            },
+                                            {
+                                                country: company.country,
+                                                company_name: company.company_name,
+                                                directory: company.directory,
+                                                $addToSet: {
+                                                    emails: {
+                                                        $each: moreMail.data.emails.map(function (email) {
+                                                            if (email.confidence > 40) return email.value;
+                                                        })
+                                                    }
+                                                },
+                                                first_name: moreMail.data.emails.forEach(function (email) {
+                                                    return email.first_name;
+                                                })
+                                            },
+                                            {
+                                                new: true,
+                                                upsert: true
+                                            }, function (err) {
+                                                if (err) console.log(err);
+                                                else {
+                                                    offset += 10;
+                                                    if (hunterObj.meta.results > 10 && offset < hunterObj.meta.results) getMoreEmail();
+                                                }
+                                            });
                                     });
-                            });
-                        //}
-                    }
-                    getMoreEmail();
-                    --counter;
-                    if (!counter) callback('Extraction Completed!');
-                }
-                else {
-                    console.log("No Email");
-                    --counter;
-                    if (!counter) callback('Extraction Completed!');
-                }
-            });
+                                    //}
+                                }
+                                getMoreEmail();
+                                --counter;
+                                if (!counter) callback('Extraction Completed!');
+                            }
+                            else {
+                                console.log("No Email");
+                                --counter;
+                                if (!counter) callback('Extraction Completed!');
+                            }
+                        }
+                    });
+                });
+            }
+            getKey();
         });
     })
 }
