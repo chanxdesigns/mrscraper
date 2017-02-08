@@ -3,7 +3,8 @@ var mongoose = require('mongoose'),
     request = require('request'),
     cheerio = require('cheerio'),
     DB = require('./dbconn'),
-    https = require('https');
+    https = require('https'),
+    mail = require('./mailer');
 
 var directories = [{dir: "esomar", dirname: "Esomar", url: "directory.esomar.org", https: true}];
 
@@ -141,13 +142,11 @@ function extractEmail (dir, callback) {
             function getKey () {
                 var apikey = Api.findOne({'usage': true});
                 apikey.exec(function (err, apikey) {
-                    //console.log(apikey.key);//
                     queryUri = 'https://api.hunter.io/v2/domain-search?domain='+ company.company_url +'&api_key='+apikey.key;
                     console.log(queryUri);
                     request(queryUri, function (err, res, body) {
                         if (err) throw err;
                         var hunterObj = JSON.parse(body);
-                        console.log(hunterObj);
                         if (hunterObj.errors) {
                             Api.findOneAndUpdate(
                                 {
@@ -158,7 +157,6 @@ function extractEmail (dir, callback) {
                                 },
                                 function (err) {
                                     if (err) throw err;
-                                    console.log('I\'m executed');
                                     console.log('API KEY UPDATED');
                                     getKey();
                                 }
@@ -166,7 +164,7 @@ function extractEmail (dir, callback) {
                         }
                         else {
                             if (hunterObj.data.emails.length !== 0) {
-                                console.log('Coming Here');
+                                //console.log('Coming Here');
                                 var offset = 0;
                                 function getMoreEmail () {
                                     //if (offset >= hunterObj.meta.results) return false;
@@ -206,20 +204,28 @@ function extractEmail (dir, callback) {
                                                 if (err) console.log(err);
                                                 else {
                                                     offset += 10;
+                                                    //if (offset >= hunterObj.meta.results) ;
                                                     if (hunterObj.meta.results > 10 && offset < hunterObj.meta.results) getMoreEmail();
                                                 }
                                             });
                                     });
-                                    //}
                                 }
                                 getMoreEmail();
                                 --counter;
-                                if (!counter) callback('Extraction Completed!');
+                                console.log(counter);
+                                if (!counter) {
+                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file.<br><br> To download visit <a href="http://localhost:8000/download">Click to download</a>','chanx.singha@c-research.in');
+                                    callback('Extraction Completed!');
+                                }
                             }
                             else {
                                 console.log("No Email");
                                 --counter;
-                                if (!counter) callback('Extraction Completed!');
+                                console.log(counter);
+                                if (!counter) {
+                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file.<br><br> To download visit <a href="http://localhost:8000/download">Click to download</a>','chanx.singha@c-research.in');
+                                    callback('Extraction Completed!');
+                                }
                             }
                         }
                     });
@@ -228,6 +234,10 @@ function extractEmail (dir, callback) {
             getKey();
         });
     })
+}
+
+function sendMail (msg) {
+
 }
 
 function getCompanies(dir,callback) {
