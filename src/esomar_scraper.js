@@ -121,10 +121,14 @@ function extractCompanies (dir, callback) {
                         })
                     });
                     --counter;
-                    //if (!counter) callback("Extracting Completed.");
+                    console.log(counter);
+                    if (!counter) {
+                        mail.send('Companies Extraction Completed', 'This is to notify you that your companies extraction job is completed. You may now extract e-mails by visiting http://'+location.hostname+'/esomar/extract-email','chanx.singha@c-research.in');
+                        callback("Extraction Completed.");
+                    }
                 });
             });
-            callback("Extracting Data, Please Wait");
+            //callback("Extracting Data, Please Wait");
         }
     });
 }
@@ -214,7 +218,7 @@ function extractEmail (dir, callback) {
                                 --counter;
                                 console.log(counter);
                                 if (!counter) {
-                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file.<br><br> To download visit <a href="http://localhost:8000/download">Click to download</a>','chanx.singha@c-research.in');
+                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+location.hostname+'/download','chanx.singha@c-research.in');
                                     callback('Extraction Completed!');
                                 }
                             }
@@ -223,7 +227,7 @@ function extractEmail (dir, callback) {
                                 --counter;
                                 console.log(counter);
                                 if (!counter) {
-                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file.<br><br> To download visit <a href="http://localhost:8000/download">Click to download</a>','chanx.singha@c-research.in');
+                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+location.hostname+'/download','chanx.singha@c-research.in');
                                     callback('Extraction Completed!');
                                 }
                             }
