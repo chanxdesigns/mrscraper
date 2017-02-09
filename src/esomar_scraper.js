@@ -59,21 +59,21 @@ function extractCompanies (response, callback) {
             for (var i = 0; i < cn_europe.length; i++) {
                 companies.push({
                     country_name: $(cn_europe[i]).find('a').html().split('(')[0].trim(),
-                    esomar_url: 'https://' + getDirectory(dir).url + '/' + $(cn_europe[i]).find('a').attr('href')
+                    esomar_url: 'https://' + getDirectory('esomar').url + '/' + $(cn_europe[i]).find('a').attr('href')
                 });
             }
             
             for (var i = 0; i < cn_asia.length; i++) {
                 companies.push({
                     country_name: $(cn_asia[i]).find('a').html().split('(')[0].trim(),
-                    esomar_url: 'https://' + getDirectory(dir).url + '/' + $(cn_asia[i]).find('a').attr('href')
+                    esomar_url: 'https://' + getDirectory('esomar').url + '/' + $(cn_asia[i]).find('a').attr('href')
                 });
             }
 
             for (var i = 0; i < cn_north_america.length; i++) {
                 companies.push({
                     country_name: $(cn_north_america[i]).find('a').html().split('(')[0].trim(),
-                    esomar_url: 'https://' + getDirectory(dir).url + '/' + $(cn_north_america[i]).find('a').attr('href')
+                    esomar_url: 'https://' + getDirectory('esomar').url + '/' + $(cn_north_america[i]).find('a').attr('href')
                 });
             }
 
@@ -105,7 +105,7 @@ function extractCompanies (response, callback) {
                                                 var Companies = mongoose.model('Companies', DB.companySchema);
                                                 var company = new Companies({
                                                     country: val.country_name,
-                                                    directory: getDirectory(dir).dirname,
+                                                    directory: getDirectory('esomar').dirname,
                                                     company_name: $('h1.uppercase.mb0').text().trim(),
                                                     company_url: $('a[data-ga-category="website"]').attr('href') !== undefined ? $('a[data-ga-category="website"]').attr('href') : 404
                                                 });
@@ -243,7 +243,6 @@ function extractEmail (response, callback) {
  * Get Companies
  * Allows you to download Companies as CSV file
  *
- * @param dir
  * @param callback
  */
 function getCompanies(callback) {
@@ -263,8 +262,8 @@ function getCompanies(callback) {
 DB.makeDbConn();
 
 var scraper = {
-    extract: function (dir, callback) {
-        extractCompanies(dir, function (data) {
+    extract: function (res, callback) {
+        extractCompanies(res, function (data) {
             callback(data);
         })
     },
