@@ -30,6 +30,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 // Homepage
 app.get('/', function (req, res) {
+    console.log(req.host)
    res.render('home');
 });
 
