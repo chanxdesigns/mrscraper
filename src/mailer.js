@@ -1,7 +1,6 @@
 var email = require('emailjs');
 
 function sendMail (sub, msg, to) {
-    console.log("Invoked");
     var server 	= email.server.connect({
         user:    "info@c-research.in",
         password:"$}_F8z_=sF5p",

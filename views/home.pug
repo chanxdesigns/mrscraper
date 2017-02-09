@@ -1,0 +1,58 @@
+doctype html
+
+style(type="text/css").
+    body {
+        font-family: Roboto, sans-serif;
+        padding: 0;
+        margin: 0;
+    }
+    .main {
+        background: #1F3A93;
+        margin: 5% 20% 0 ;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .main > h3 {
+        margin: 0 0 5px;
+        color: white;
+    }
+
+    .main > a {
+        margin-top: 5px;
+        color: whitesmoke;
+    }
+    .extras {
+        background: #1F3A93;
+        margin: 2% 20%;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    .extras > h3 {
+        margin: 0 0 5px;
+        color: white;
+    }
+    .extras > a {
+        margin-top: 10px;
+        color: whitesmoke;
+    }
+
+
+html
+    head
+        meta(name="viewport" content="width=device-width, initial-scale=1, max-scale=1")/
+        link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")/
+        title Extraction Page
+        body
+            div.main
+                h3 Esomar Extraction
+                a(href="/esomar/extract-companies") Extract Companies
+                br
+                a(href="/esomar/extract-email") Extract Email
+            div.extras
+                h3 Extra Functions
+                a(href="/get-companies") Download Companies
+                br
+                a(href="/api-keys") Generate API Keys
+                br
+                a(href="/download") Download CSV

@@ -2,6 +2,9 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var DB = {
+    /**
+     * Model Schemas
+     */
     companySchema: new Schema({
         country: String,
         directory: String,
@@ -24,16 +27,15 @@ var DB = {
         usage: Boolean
     }),
 
+    /**
+     * Make Database Connection
+     */
     makeDbConn: function () {
-        var uri = "mongodb://127.0.0.1:27017";
+        var uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017";
 
         mongoose.connect(uri, function (err, res) {
-            if (err) {
-                console.log('There is an error: '+err);
-            }
-            else {
-                console.log('Successfully connected to '+uri);
-            }
+            if (err) throw Error('There is an error: '+err);
+            console.log('Successfully connected to '+uri);
         });
     }
 };

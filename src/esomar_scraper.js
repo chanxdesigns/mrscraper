@@ -3,10 +3,9 @@ var mongoose = require('mongoose'),
     request = require('request'),
     cheerio = require('cheerio'),
     DB = require('./dbconn'),
-    https = require('https'),
     mail = require('./mailer');
 
-var directories = [{dir: "esomar", dirname: "Esomar", url: "directory.esomar.org", https: true}];
+var directories = [{dir: "esomar", dirname: "Esomar", url: "directory.esomar.org"}, {dir: "greenbook", dirname: "Green Book", url: ""}];
 
 /**
  * Get Individual Directory
@@ -53,7 +52,7 @@ function extractCompanies (dir, callback) {
                 cn_asia = $('#content-location_asia_pacific li'),
                 cn_north_america = $('#content-location_north_america li');
 
-            // Get Europe Company List
+            // Get Company List
             var companies = [];
 
             for (var i = 0; i < cn_europe.length; i++) {
@@ -77,6 +76,7 @@ function extractCompanies (dir, callback) {
                 });
             }
 
+            // Get Companies Details
             var counter = companies.length;
             companies.forEach(function (val) {
                 request(val.esomar_url, function (err, res, body) {
@@ -121,7 +121,6 @@ function extractCompanies (dir, callback) {
                         })
                     });
                     --counter;
-                    console.log(counter);
                     if (!counter) {
                         mail.send('Companies Extraction Completed', 'This is to notify you that your companies extraction job is completed. You may now extract e-mails by visiting http://'+location.hostname+'/esomar/extract-email','chanx.singha@c-research.in');
                         callback("Extraction Completed.");
@@ -147,7 +146,6 @@ function extractEmail (dir, callback) {
                 var apikey = Api.findOne({'usage': true});
                 apikey.exec(function (err, apikey) {
                     queryUri = 'https://api.hunter.io/v2/domain-search?domain='+ company.company_url +'&api_key='+apikey.key;
-                    console.log(queryUri);
                     request(queryUri, function (err, res, body) {
                         if (err) throw err;
                         var hunterObj = JSON.parse(body);
@@ -168,11 +166,8 @@ function extractEmail (dir, callback) {
                         }
                         else {
                             if (hunterObj.data.emails.length !== 0) {
-                                //console.log('Coming Here');
                                 var offset = 0;
                                 function getMoreEmail () {
-                                    //if (offset >= hunterObj.meta.results) return false;
-                                    //if (EmailCollection.findOne({country: company.country, company_url: company.company_url})) {
                                     if (hunterObj.meta.results > 10) {
                                         var url = offset >= 10 ? queryUri+'&offset='+offset : queryUri;
                                     }
@@ -216,16 +211,13 @@ function extractEmail (dir, callback) {
                                 }
                                 getMoreEmail();
                                 --counter;
-                                console.log(counter);
                                 if (!counter) {
                                     mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+location.hostname+'/download','chanx.singha@c-research.in');
                                     callback('Extraction Completed!');
                                 }
                             }
                             else {
-                                console.log("No Email");
                                 --counter;
-                                console.log(counter);
                                 if (!counter) {
                                     mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+location.hostname+'/download','chanx.singha@c-research.in');
                                     callback('Extraction Completed!');
@@ -240,23 +232,27 @@ function extractEmail (dir, callback) {
     })
 }
 
-function sendMail (msg) {
-
-}
-
+/**
+ * Get Companies
+ * Allows you to download Companies as CSV file
+ *
+ * @param dir
+ * @param callback
+ */
 function getCompanies(dir,callback) {
     var Companies = mongoose.model('Companies', DB.companySchema);
     var query = Companies.find({});
     query.exec(function (err, companies) {
         if (err) {
-            console.log("Somethings wrong while retrieving "+err);
             return "Somethings wrong while retrieving "+err;
         }
         callback(companies);
     })
 }
 
-// Initiate Database Connection
+/**
+ * Initiate Database Connection
+ */
 DB.makeDbConn();
 
 var scraper = {

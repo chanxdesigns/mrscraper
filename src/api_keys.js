@@ -9,8 +9,6 @@ function insert (api_keys, callback) {
     var keys = api_keys.split(',');
     var Api = mongoose.model('ApiKeys', DB.apiKeySchema);
 
-    console.log(keys);
-
     var counter = keys.length;
     keys.forEach(function (apikey) {
         Api.findOneAndUpdate({key: apikey},
@@ -25,7 +23,6 @@ function insert (api_keys, callback) {
             function (err) {
                 if (err) throw err;
                 --counter;
-                console.log(counter);
                 if (!counter) callback('API Keys Inserted');
             })
     })

@@ -21,7 +21,6 @@ function generate (callback) {
             var date = Date.now();
             fs.writeFile('files/emails_'+ date +'.csv', csv, function(err) {
                 if (err) throw err;
-                //console.log('File saved Locally');
                 var clientOptions = {
                     accessKeyId: "AKIAJFBO2N5FZEARJXYA",
                     secretAccessKey: "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",
