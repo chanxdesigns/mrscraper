@@ -40,11 +40,12 @@ function getDirectory (directoryName) {
 /***
  * Landing Page Scraping Function
  *
- * @param dir
+ * @param response
+ * @param callback
  * @returns {*}
  */
-function extractCompanies (dir, callback) {
-    request('https://'+getDirectory(dir).url, function (err, res, body) {
+function extractCompanies (response, callback) {
+    request('https://'+getDirectory('esomar').url, function (err, res, body) {
         if (body) {
             // Extract Countries Continents
             var $ = cheerio.load(body),
@@ -122,7 +123,7 @@ function extractCompanies (dir, callback) {
                     });
                     --counter;
                     if (!counter) {
-                        mail.send('Companies Extraction Completed', 'This is to notify you that your companies extraction job is completed. You may now extract e-mails by visiting http://'+location.hostname+'/esomar/extract-email','chanx.singha@c-research.in');
+                        mail.send('Companies Extraction Completed', 'This is to notify you that your companies extraction job is completed. You may now extract e-mails by visiting http://'+response.hostname+'/esomar/extract-email','chanx.singha@c-research.in');
                         callback("Extraction Completed.");
                     }
                 });
@@ -132,7 +133,13 @@ function extractCompanies (dir, callback) {
     });
 }
 
-function extractEmail (dir, callback) {
+/**
+ * Extract Emails
+ *
+ * @param response
+ * @param callback
+ */
+function extractEmail (response, callback) {
     var Companies = mongoose.model('Companies', DB.companySchema),
         EmailCollection = mongoose.model('CompaniesEmail', DB.companyEmailSchema),
         Api = mongoose.model('ApiKeys', DB.apiKeySchema),
@@ -212,14 +219,14 @@ function extractEmail (dir, callback) {
                                 getMoreEmail();
                                 --counter;
                                 if (!counter) {
-                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+location.hostname+'/download','chanx.singha@c-research.in');
+                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+response.hostname+'/download','chanx.singha@c-research.in');
                                     callback('Extraction Completed!');
                                 }
                             }
                             else {
                                 --counter;
                                 if (!counter) {
-                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+location.hostname+'/download','chanx.singha@c-research.in');
+                                    mail.send('Email Extraction Completed', 'This is to notify you that your e-mail extraction is completed. You may now download the csv file. To download visit http://'+response.hostname+'/download','chanx.singha@c-research.in');
                                     callback('Extraction Completed!');
                                 }
                             }
@@ -239,7 +246,7 @@ function extractEmail (dir, callback) {
  * @param dir
  * @param callback
  */
-function getCompanies(dir,callback) {
+function getCompanies(callback) {
     var Companies = mongoose.model('Companies', DB.companySchema);
     var query = Companies.find({});
     query.exec(function (err, companies) {

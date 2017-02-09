@@ -30,28 +30,27 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 // Homepage
 app.get('/', function (req, res) {
-    console.log(req.host)
    res.render('home');
 });
 
 // Extract Companies
-app.get('/:directory/extract-companies', function (req, res) {
-    scraper.extract(req.params.directory, function (data) {
+app.get('/esomar/extract-companies', function (req, res) {
+    scraper.extract(res, function (data) {
         res.setHeader('content-type', 'text/plain');
         res.send(data);
     });
 });
 
 // Extract E-Mail
-app.get('/:directory/extract-email', function (req, res) {
-    scraper.extractEmail(req.params.directory,function (data) {
+app.get('/esomar/extract-email', function (req, res) {
+    scraper.extractEmail(res, function (data) {
         res.send(data);
     })
 });
 
 // Download Companies
 app.get('/get-companies', function (req, res) {
-    scraper.getCompanies('',function (companies) {
+    scraper.getCompanies(function (companies) {
         res.send(companies);
     })
 });
