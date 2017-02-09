@@ -78,6 +78,6 @@ app.get('/download', function (req, res) {
 });
 
 // Start Request Listening
-app.listen(8000,function () {
+app.listen(process.env.PORT || 5000,function () {
     console.log("App started responding")
 });
