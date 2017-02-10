@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
     DB = require('./dbconn'),
     mail = require('./mailer');
 
-var directories = [{dir: "esomar", dirname: "Esomar", url: "directory.esomar.org"}, {dir: "greenbook", dirname: "Green Book", url: ""}];
+var directories = [{dir: "esomar", dirname: "Esomar", url: "directory.esomar.org"}];
 
 /**
  * Get Individual Directory

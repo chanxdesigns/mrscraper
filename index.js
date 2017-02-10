@@ -11,6 +11,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     winston = require('winston'),
     scraper = require('./src/esomar_scraper'),
+    bluebook = require('./src/bluebook_scraper'),
     csv = require('./src/csv_maker'),
     api_keys = require('./src/api_keys');
 
@@ -33,7 +34,7 @@ app.get('/', function (req, res) {
    res.render('home');
 });
 
-// Extract Companies
+// Extract Esomar Companies
 app.get('/esomar/extract-companies', function (req, res) {
     scraper.extract(res, function (data) {
         res.setHeader('content-type', 'text/plain');
@@ -41,11 +42,18 @@ app.get('/esomar/extract-companies', function (req, res) {
     });
 });
 
-// Extract E-Mail
+// Extract Esomar E-Mail
 app.get('/esomar/extract-email', function (req, res) {
     scraper.extractEmail(res, function (data) {
         res.send(data);
     })
+});
+
+// Extract Bluebook
+app.get('/bluebook/extract-email', function (req, res) {
+    bluebook.extract(function (resp) {
+        res.send(resp);
+    });
 });
 
 // Download Companies
