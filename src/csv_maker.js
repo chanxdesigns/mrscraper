@@ -8,9 +8,19 @@ var json2csv = require('json2csv'),
  * Generate CSV file
  *
  * @param callback
+ * @param dir
  */
-function generate (callback) {
-    var EmailCollection = mongoose.model('CompaniesEmail', DB.companyEmailSchema);
+function generate (dir, callback) {
+    var db;
+    switch(dir) {
+        case "esomar":
+            db = 'CompaniesEmail';
+            break;
+        case "bluebook":
+            db = 'BlueBookMail';
+            break;
+    }
+    var EmailCollection = mongoose.model(db, DB.companyEmailSchema);
     var emails = EmailCollection.find({});
     emails.exec(function (err, obj) {
         if (err) console.log(err);

@@ -78,8 +78,8 @@ app.post('/submit', function (req, res) {
 });
 
 // Download E-MAILS List CSV File
-app.get('/download', function (req, res) {
-    csv(function (file_url) {
+app.get('/:directory/download', function (req, res) {
+    csv(req.params.directory, function (file_url) {
         var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="'+file_url+'">Download</a>';
         res.send(html);
     })
