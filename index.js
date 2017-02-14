@@ -67,18 +67,15 @@ app.get('/bluebook/extract-email', function (req, res) {
     //     .catch(function (err) {
     //         console.log(err.message);
     //     })
-    bluebook.pages()
+    bluebook.companies()
         .then(function (pagesArr) {
-            return Promise.all(bluebook.companies(pagesArr));
-        })
-        .then(function (companyDetails) {
-            return Promise.all(bluebook.insert(companyDetails));
+            return Promise.all(bluebook.mails(pagesArr));
         })
         .then(function () {
             res.send("Email Extraction and Insertion Completed")
         })
         .catch(function (err) {
-            console.log(err);
+            console.log(err.message);
         })
 });
 
