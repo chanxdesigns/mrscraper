@@ -41,24 +41,26 @@ function extractCompanies (pagesElem) {
 
 function extractMails (companies) {
     return companies.map(function (company) {
-        var $ = cheerio.load(company);
-        var compList = $(company).find('#listInfo span'),
-            bb_url = $(compList).find('a').attr('href');
-        return Rp(bluebook.host + (bb_url.trim().slice(1)))
-            .then(function (body) {
-                var $ = cheerio.load(body),
-                    compDetails = $('#companycontactstable2 tr').first().html();
-                return {
-                    compName: $('.details-top').find('h1').text(),
-                    emails: compDetails.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi)
-                }
-            })
+        if (company !== undefined) {
+            var $ = cheerio.load(company);
+            var compList = $(company).find('#listInfo span'),
+                bb_url = $(compList).find('a').attr('href');
+            return Rp(bluebook.host + (bb_url.trim().slice(1)))
+                .then(function (body) {
+                    var $ = cheerio.load(body),
+                        compDetails = $('#companycontactstable2 tr').first().html();
+                    return {
+                        compName: $('.details-top').find('h1').text(),
+                        emails: compDetails.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi)
+                    }
+                })
+        }
     })
 }
 
 function insert (companies) {
-    var BluebookMail = mongoose.model('BlueBookMail', DB.companyEmailSchema);
     return companies.map(function (company) {
+        var BluebookMail = mongoose.model('BlueBookMail', DB.companyEmailSchema);
         BluebookMail.findOneAndUpdate(
             {
                 directory: "Bluebook",
