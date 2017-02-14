@@ -51,21 +51,28 @@ app.get('/esomar/extract-email', function (req, res) {
 
 // Extract Bluebook
 app.get('/bluebook/extract-email', function (req, res) {
-    bluebook.page()
-        .then(function (pagesElem) {
-            return Promise.all(bluebook.companies(pagesElem));
-        })
-        .then(function (companies) {
-            return Promise.all(bluebook.mails(companies));
-        })
-        .then(function (compdet) {
-            return Promise.all(bluebook.insert(compdet))
-        })
+    // bluebook.page()
+    //     .then(function (pagesElem) {
+    //         return Promise.all(bluebook.companies(pagesElem));
+    //     })
+    //     .then(function (companies) {
+    //         return Promise.all(bluebook.mails(companies));
+    //     })
+    //     .then(function (compdet) {
+    //         return Promise.all(bluebook.insert(compdet))
+    //     })
+    //     .then(function () {
+    //         res.send('Email Extraction and Insertion Complete');
+    //     })
+    //     .catch(function (err) {
+    //         console.log(err.message);
+    //     })
+    bluebook.extract()
         .then(function () {
-            res.send('Email Extraction and Insertion Complete');
+            res.send("Extracted")
         })
         .catch(function (err) {
-            console.log(err.message);
+            console.log(err);
         })
 });
 
