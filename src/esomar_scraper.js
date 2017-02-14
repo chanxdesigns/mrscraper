@@ -197,11 +197,13 @@ function extractEmail (response, callback) {
                                                         $each: moreMail.data.emails.map(function (email) {
                                                             if (email.confidence > 40) return email.value;
                                                         })
+                                                    },
+                                                    names: {
+                                                        $each: moreMail.data.emails.map(function (email) {
+                                                            if (email.confidence > 40) return email.last_name ? email.first_name + ' ' + email.last_name : email.first_name;
+                                                        })
                                                     }
-                                                },
-                                                first_name: moreMail.data.emails.forEach(function (email) {
-                                                    return email.first_name;
-                                                })
+                                                }
                                             },
                                             {
                                                 new: true,

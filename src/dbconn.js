@@ -19,6 +19,7 @@ var DB = {
         company_name: String,
         company_url: String,
         emails: Array,
+        names: Array,
         created_time: {type: Date, default: Date.now}
     }),
 
