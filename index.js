@@ -67,9 +67,12 @@ app.get('/bluebook/extract-email', function (req, res) {
     //     .catch(function (err) {
     //         console.log(err.message);
     //     })
-    bluebook.companies()
+    bluebook.pages()
         .then(function (pagesArr) {
-            return Promise.all(bluebook.mails(pagesArr));
+            return Promise.all(bluebook.companies(pagesArr));
+        })
+        .then(function (companyDetails) {
+            return Promise.all(bluebook.insert(companyDetails));
         })
         .then(function () {
             res.send("Email Extraction and Insertion Completed")
