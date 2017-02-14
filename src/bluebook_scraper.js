@@ -59,30 +59,33 @@ function extractMails (companies) {
 }
 
 function insert (companies) {
+    var BluebookMail = mongoose.model('BlueBookMail', DB.companyEmailSchema);
     return companies.map(function (company) {
-        var BluebookMail = mongoose.model('BlueBookMail', DB.companyEmailSchema);
-        BluebookMail.findOneAndUpdate(
-            {
-                directory: "Bluebook",
-                company_url: 'www.'+company.emails[0].split('@')[1]
-            },
-            {
-                company_name: company.compName,
-                emails: company.emails.reduce(function (result, email) {
-                    if (result.indexOf(email) < 0) {
-                        result.push(email);
-                    }
-                    return result;
-                },[])
-            },
-            {
-                upsert: true,
-                new: true
-            },
-            function (err) {
-                if (err) throw err;
-            }
-        )
+        if (company.compName && company.emails) {
+            BluebookMail.findOneAndUpdate(
+                {
+                    directory: "Bluebook",
+                    company_url: 'www.'+company.emails[0].split('@')[1]
+                },
+                {
+                    company_name: company.compName,
+                    emails: company.emails.reduce(function (result, email) {
+                        if (result.indexOf(email) < 0) {
+                            result.push(email);
+                        }
+                        return result;
+                    },[])
+                },
+                {
+                    upsert: true,
+                    new: true
+                },
+                function (err,res) {
+                    if (err) throw err;
+                    console.log(res)
+                }
+            )
+        }
     })
 }
 
