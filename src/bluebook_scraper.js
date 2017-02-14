@@ -91,7 +91,7 @@ var bluebook = {
 
 function extractEmail(callback) {
     var BluebookMail = mongoose.model('BlueBookMail', DB.companyEmailSchema);
-    return Rp(bluebook.host + bluebook.mainPath)
+    Rp(bluebook.host + bluebook.mainPath)
         .then(function (body) {
             if (body !== undefined) {
                 var $ = cheerio.load(body),
