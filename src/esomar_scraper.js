@@ -62,7 +62,7 @@ function extractCompanies (response, callback) {
                     esomar_url: 'https://' + getDirectory('esomar').url + '/' + $(cn_europe[i]).find('a').attr('href')
                 });
             }
-            
+
             for (var i = 0; i < cn_asia.length; i++) {
                 companies.push({
                     country_name: $(cn_asia[i]).find('a').html().split('(')[0].trim(),
@@ -89,6 +89,8 @@ function extractCompanies (response, callback) {
                         links.push($(pages_elem[i]).attr('href'));
                     }
 
+                    // Companies Model
+                    var Companies = mongoose.model('Companies', DB.companySchema);
                     links.forEach(function (link) {
                         request(link, function (err, res, body) {
                             if (body !== undefined) {
@@ -101,19 +103,27 @@ function extractCompanies (response, callback) {
                                     if (company_esomar_url !== undefined) {
                                         request(company_esomar_url, function (err, res, body) {
                                             if (body !== undefined) {
-                                                var $ = cheerio.load(body);
-                                                var Companies = mongoose.model('Companies', DB.companySchema);
-                                                var company = new Companies({
-                                                    country: val.country_name,
-                                                    directory: getDirectory('esomar').dirname,
-                                                    company_name: $('h1.uppercase.mb0').text().trim(),
-                                                    company_url: $('a[data-ga-category="website"]').attr('href') !== undefined ? $('a[data-ga-category="website"]').attr('href') : 404
-                                                });
+                                                var $ = cheerio.load(body),
+                                                    compUrl = $('a[data-ga-category="website"]').attr('href');
 
-                                                company.save(function (err, res) {
-                                                    if (err) console.log("Somethings wrong while saving: "+err);
-                                                    else console.log("Inserted "+ res);
-                                                })
+                                                Companies.findOneAndUpdate(
+                                                    {
+                                                        company_url: compUrl
+                                                    },
+                                                    {
+                                                        country: val.country_name,
+                                                        directory: getDirectory('esomar').dirname,
+                                                        company_name: $('h1.uppercase.mb0').text().trim()
+                                                    },
+                                                    {
+                                                        upsert: true,
+                                                        new: true
+                                                    },
+                                                    function (err, res) {
+                                                        if (err) console.log(err.message);
+                                                        console.log(res);
+                                                    }
+                                                )
                                             }
                                         })
                                     }
