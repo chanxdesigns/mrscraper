@@ -89,68 +89,71 @@ var bluebook = {
 //     })
 // }
 
-function extractEmail(callback) {
-    var BluebookMail = mongoose.model('BlueBookMail', DB.companyEmailSchema);
-    Rp(bluebook.host + bluebook.mainPath)
+function extractCompanies() {
+    return Rp(bluebook.host + bluebook.mainPath)
         .then(function (body) {
             if (body !== undefined) {
                 var $ = cheerio.load(body),
-                    raw = $('.search-total select option'),
-                    pagesArr = raw.splice(0, (raw.length / 2));
-
-                return pagesArr.map(function (page) {
-                    var url = $(page).val();
-                    return Rp(bluebook.host + url)
-                        .then(function (body) {
-                            if (body !== undefined) {
-                                var $ = cheerio.load(body),
-                                    resultsArr = $('.search-list #resultsDet').splice(0);
-
-                                return resultsArr.map(function (result) {
-                                    var compList = $(result).find('#listInfo span'),
-                                        bb_url = $(compList).find('a').attr('href');
-
-                                    return Rp(bluebook.host + (bb_url.trim().slice(1)))
-                                        .then(function (body) {
-                                            if (body !== undefined) {
-                                                var $ = cheerio.load(body),
-                                                    compName = $('.details-top').find('h1').text(),
-                                                    compDetails = $('#companycontactstable2 tr').first().html(),
-                                                    emails = compDetails.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
-
-                                                if (emails) {
-                                                    BluebookMail.findOneAndUpdate(
-                                                        {
-                                                            directory: "Bluebook",
-                                                            company_url: 'www.'+emails[0].split('@')[1]
-                                                        },
-                                                        {
-                                                            company_name: compName,
-                                                            emails: emails.reduce(function (result, email) {
-                                                                if (result.indexOf(email) < 0) {
-                                                                    result.push(email);
-                                                                }
-                                                                return result;
-                                                            },[])
-                                                        },
-                                                        {
-                                                            upsert: true,
-                                                            new: true
-                                                        },
-                                                        function (err, res) {
-                                                            if (err) throw err;
-                                                            console.log(res);
-                                                        }
-                                                    )
-                                                }
-                                            }
-                                        })
-                                })
-                            }
-                        })
-                });
+                    raw = $('.search-total select option');
+                    return raw.splice(0, (raw.length / 2));
             }
         })
 }
 
-module.exports = {extract: extractEmail}//{page: extractPages, companies: extractCompanies, mails: extractMails, insert: insert};
+function extractMail(pagesArr) {
+    var BluebookMail = mongoose.model('BlueBookMail', DB.companyEmailSchema);
+    return pagesArr.map(function (page) {
+        var $ = cheerio.load(page);
+        var url = $(page).val();
+        return Rp(bluebook.host + url)
+            .then(function (body) {
+                if (body !== undefined) {
+                    var $ = cheerio.load(body),
+                        resultsArr = $('.search-list #resultsDet').splice(0);
+
+                    return resultsArr.map(function (result) {
+                        var compList = $(result).find('#listInfo span'),
+                            bb_url = $(compList).find('a').attr('href');
+
+                        return Rp(bluebook.host + (bb_url.trim().slice(1)))
+                            .then(function (body) {
+                                if (body !== undefined) {
+                                    var $ = cheerio.load(body),
+                                        compName = $('.details-top').find('h1').text(),
+                                        compDetails = $('#companycontactstable2 tr').first().html(),
+                                        emails = compDetails.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
+
+                                    if (emails) {
+                                        BluebookMail.findOneAndUpdate(
+                                            {
+                                                directory: "Bluebook",
+                                                company_url: 'www.'+emails[0].split('@')[1]
+                                            },
+                                            {
+                                                company_name: compName,
+                                                emails: emails.reduce(function (result, email) {
+                                                    if (result.indexOf(email) < 0) {
+                                                        result.push(email);
+                                                    }
+                                                    return result;
+                                                },[])
+                                            },
+                                            {
+                                                upsert: true,
+                                                new: true
+                                            },
+                                            function (err, res) {
+                                                if (err) throw err;
+                                                console.log(res);
+                                            }
+                                        )
+                                    }
+                                }
+                            })
+                    })
+                }
+            })
+    });
+}
+
+module.exports = {companies: extractCompanies, mails: extractMail}//{page: extractPages, companies: extractCompanies, mails: extractMails, insert: insert};
