@@ -109,24 +109,16 @@ function extractCompanies (response, callback) {
                                                 Companies.findOne({company_url: compUrl})
                                                     .exec(function (err, data) {
                                                         if (!data) {
-                                                            Companies.findOneAndUpdate(
-                                                                {
-                                                                    company_url: compUrl
-                                                                },
-                                                                {
-                                                                    country: val.country_name,
-                                                                    directory: getDirectory('esomar').dirname,
-                                                                    company_name: $('h1.uppercase.mb0').text().trim()
-                                                                },
-                                                                {
-                                                                    upsert: true,
-                                                                    new: true
-                                                                },
-                                                                function (err, res) {
-                                                                    if (err) console.log(err.message);
-                                                                    console.log(res);
-                                                                }
-                                                            )
+                                                            var Email = new Companies({
+                                                                country: val.country_name,
+                                                                directory: getDirectory('esomar').dirname,
+                                                                company_name: $('h1.uppercase.mb0').text().trim(),
+                                                                company_url: compUrl
+                                                            });
+                                                            Email.save(function (err, res) {
+                                                                if (err) console.log(err.message);
+                                                                console.log(res);//
+                                                            })
                                                         }
                                                     });
                                             }
