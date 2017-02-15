@@ -44,7 +44,7 @@ function getDirectory (directoryName) {
  * @param callback
  * @returns {*}
  */
-function extractCompanies (response, callback) {
+function extractCompanies () {
     request('https://'+getDirectory('esomar').url, function (err, res, body) {
         if (body) {
             // Extract Countries Continents
@@ -128,14 +128,8 @@ function extractCompanies (response, callback) {
                             }
                         })
                     });
-                    --counter;
-                    if (!counter) {
-                        mail.send('Companies Extraction Completed', 'This is to notify you that your companies extraction job is completed. You may now extract e-mails by visiting http://'+response.hostname+'/esomar/extract-email','chanx.singha@c-research.in');
-                        callback("Extraction Completed.");
-                    }
                 });
             });
-            //callback("Extracting Data, Please Wait");
         }
     });
 }
