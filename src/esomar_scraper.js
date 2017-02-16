@@ -21,13 +21,16 @@ esomarWorker.process(function (dir) {
             return Promise.all(extractCountryCompanyPages(countriesEsomarUrl));
         })
         .then(function (country_company_pages) {
-            extractAllCompaniesInfo(country_company_pages);//
+            return Promise.all(extractAllCompaniesInfo(country_company_pages));//
                 // .then(function (data) {
                 //     console.log(data);
                 // })
                 // .catch(function (err) {
                 //     console.log(err.message)
                 // })
+        })
+        .then (function (b) {
+            console.log(b);
         })
         .catch(function (err) {
             console.log(err.message);
