@@ -1,6 +1,5 @@
 var Rp = require('request-promise'),
-    cheerio = require('cheerio'),
-    extractAndStoreCompanies = require('./extractAndStoreCompanies');
+    cheerio = require('cheerio');
 
 function extractAllCompanies (countries_companies_pages) {
     var pagesArr = [];

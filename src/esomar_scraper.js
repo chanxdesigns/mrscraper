@@ -5,7 +5,8 @@ var mongoose = require('mongoose'),
     DB = require('./dbconn'),
     extractCountryDirPages = require('./esomar_workers/extractCountryDirPages'),
     extractCountryCompanyPages = require('./esomar_workers/extractCountryCompanyPages'),
-    extractAllCompaniesInfo = require('./esomar_workers/extractAllCompaniesInfo');
+    extractAllCompaniesInfo = require('./esomar_workers/extractAllCompaniesInfo'),
+    extractAndStoreCompanies = require('./esomar_workers/extractAndStoreCompanies');
 //mail = require('./mailer');
 
 var Queue = require('bull');
@@ -21,16 +22,13 @@ esomarWorker.process(function (dir) {
             return Promise.all(extractCountryCompanyPages(countriesEsomarUrl));
         })
         .then(function (country_company_pages) {
-            return Promise.all(extractAllCompaniesInfo(country_company_pages));//
-                // .then(function (data) {
-                //     console.log(data);
-                // })
-                // .catch(function (err) {
-                //     console.log(err.message)
-                // })
+            return Promise.all(extractAllCompaniesInfo(country_company_pages));
         })
-        .then (function (b) {
-            console.log(b.length);
+        .then (function (companiesElem) {
+            return Promise.all(extractAndStoreCompanies(companiesElem));
+        })
+        .then(function (d) {
+            console.log(d);
         })
         .catch(function (err) {
             console.log(err.message);
