@@ -27,6 +27,9 @@ function extractAllCompanies (countries_companies_pages) {
                     //if (!counter) extractAndStoreCompanies(companies_det_arr);
                 }
             })
+            .catch(function (err) {
+                console.log(err.message + " Main ERR")
+            })
         });
             // .then(function (body) {
             //     var $ = cheerio.load(body),
