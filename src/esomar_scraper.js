@@ -30,7 +30,7 @@ esomarWorker.process(function (dir) {
                 // })
         })
         .then (function (b) {
-            console.log(b);
+            console.log(b.length);
         })
         .catch(function (err) {
             console.log(err.message);
