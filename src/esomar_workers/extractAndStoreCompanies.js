@@ -33,13 +33,13 @@ function extractAndStoreCompanies (companies_elem) {
                                     company_url: compUrl
                                 });
                                 Email.save(function (err, res) {
-                                    if (err) console.log(err.message);
-                                    console.log(res);//
+                                    if (err) return err.message;
+                                    return res;
                                 })
                             }
                         })
                         .catch(function (err) {
-                            console.log(err.message);
+                            return err.message;
                         });
 
                     // return Companies.findOne({company_url: compUrl})
