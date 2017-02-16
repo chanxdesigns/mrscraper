@@ -21,14 +21,14 @@ esomarWorker.process(function (dir) {
             return Promise.all(extractCountryCompanyPages(countriesEsomarUrl));
         })
         .then(function (country_company_pages) {
-            return Promise.all(extractAllCompaniesInfo(country_company_pages));
+            extractAllCompaniesInfo(country_company_pages);
         })
-        .then (function (companiesElem) {
-            return Promise.all(extractAndStoreCompanies(companiesElem));
-        })
-        .then(function (d) {
-            console.log(d);
-        })
+        // .then (function (companiesElem) {
+        //     return Promise.all(extractAndStoreCompanies(companiesElem));
+        // })
+        // .then(function (d) {
+        //     console.log(d);
+        // })
         .catch(function (err) {
             console.log(err.message);
         })
