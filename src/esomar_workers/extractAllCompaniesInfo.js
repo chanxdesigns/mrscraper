@@ -10,22 +10,24 @@ function extractAllCompanies (countries_companies_pages) {
         })
     });
 
-    var companies_det_arr = pagesArr.map(function (page) {
-        Rp(page)
+    var companies_det_arr = [];
+    return pagesArr.map(function (page) {
+        return Rp(page)
             .then(function (body) {
                 if (body) {
-                    var $ = cheerio.load(body);
-                    return {
-                        body: $('.bg-eso-lightblue h2.mb0'),
-                        status: false
-                    };
+                    var $ = cheerio.load(body),
+                        companies_det = $('.bg-eso-lightblue h2.mb0');
+                    return companies_det;
+                    //companies_det_arr.push(companies_det);
+                    //--counter;
+                    //console.log(counter);
+                    //if (!counter) extractAndStoreCompanies(companies_det_arr);
                 }
             })
             .catch(function (err) {
                 console.log(err.message + " Main ERR")
             })
     });
-    console.log(companies_det_arr.length);
 }
 
 module.exports = extractAllCompanies;
