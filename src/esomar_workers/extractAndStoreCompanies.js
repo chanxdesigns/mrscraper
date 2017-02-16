@@ -4,11 +4,10 @@ var Rp = require('request-promise'),
 function extractAndStoreCompanies (companies_elem) {
     var companies_elem_arr = [];
     companies_elem.forEach(function (company_elems) {
-        company_elems.forEach(function (company_elem) {
-            companies_elem_arr.push(company_elem);
-        })
+            companies_elem_arr.push(company_elems);
     });
 
+    console.log(companies_elem_arr);
     console.log(companies_elem_arr.length);
 
     return companies_elem_arr.map(function (company_elem) {
