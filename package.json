@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.9.0",
+    "bluebird": "^3.4.7",
     "body-parser": "^1.16.0",
     "bull": "^2.1.2",
     "cheerio": "^0.22.0",

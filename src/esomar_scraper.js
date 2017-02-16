@@ -27,10 +27,6 @@ esomarWorker.process(function (dir) {
         .then (function (companiesElem) {
             return Promise.all(extractAndStoreCompanies(companiesElem));
         })
-        .then(function (companyEsomarUrl) {
-            console.log(companyEsomarUrl);
-            //return Promise.all(storeToDb(companyEsomarUrl));
-        })
         .then(function () {
             console.log('done');
         })

@@ -1,5 +1,8 @@
 var Rp = require('request-promise'),
-    cheerio = require('cheerio');
+    cheerio = require('cheerio'),
+    mongoose = require('mongoose');
+
+mongoose.Promise = require('bluebird');
 
 function extractAndStoreCompanies (companies_elem) {
     var companies_elem_arr = [];
@@ -11,7 +14,50 @@ function extractAndStoreCompanies (companies_elem) {
         if (company_elem) {
             var $ = cheerio.load(company_elem);
             var company_esomar_url = $(company_elem).find('a').attr('href');
-            return company_esomar_url;
+
+            return Rp(company_esomar_url)
+                .then(function (body) {
+                    var $ = cheerio.load(body),
+                        compUrl = $('a[data-ga-category="website"]').attr('href'),
+                        Companies = mongoose.model('Companies', DB.companySchema);
+
+                    var c_promises = Companies.findOne({company_url: compUrl}).exec();
+                    
+                    return c_promises
+                        .then(function (data) {
+                            if (!data) {
+                                var Email = new Companies({
+                                    country: val.country_name,
+                                    directory: getDirectory('esomar').dirname,
+                                    company_name: $('h1.uppercase.mb0').text().trim(),
+                                    company_url: compUrl
+                                });
+                                Email.save(function (err, res) {
+                                    if (err) console.log(err.message);
+                                    console.log(res);//
+                                })
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err.message);
+                        });
+
+                    // return Companies.findOne({company_url: compUrl})
+                    //     .exec(function (err, data) {
+                    //         if (!data) {
+                    //             var Email = new Companies({
+                    //                 country: val.country_name,
+                    //                 directory: getDirectory('esomar').dirname,
+                    //                 company_name: $('h1.uppercase.mb0').text().trim(),
+                    //                 company_url: compUrl
+                    //             });
+                    //             Email.save(function (err, res) {
+                    //                 if (err) console.log(err.message);
+                    //                 console.log(res);//
+                    //             })
+                    //         }
+                    //     });
+                })
         }
     })
 }
