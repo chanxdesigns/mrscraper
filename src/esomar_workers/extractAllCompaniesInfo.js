@@ -10,9 +10,8 @@ function extractAllCompanies (countries_companies_pages) {
         })
     });
 
-    var companies_det_arr = [],
-        counter = pagesArr.length;
-    pagesArr.forEach(function (page) {
+    var companies_det_arr = [];
+    pagesArr.forEach(function (page, index) {
         // return Rp(page)
         //     .then(function (body) {
         //         console.log("Yeah")
@@ -34,9 +33,8 @@ function extractAllCompanies (countries_companies_pages) {
                 var $ = cheerio.load(body),
                     companies_det = $('.bg-eso-lightblue h2.mb0');
                 companies_det_arr.push(companies_det);
-                --counter;
-                console.log(counter);
-                if (!counter) extractAndStoreCompanies(companies_det_arr);
+                console.log(index);
+                if (index === (pagesArr.length-1)) extractAndStoreCompanies(companies_det_arr);
             }
         })
     });
