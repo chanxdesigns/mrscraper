@@ -18,7 +18,7 @@ function extractAllCompanies (countries_companies_pages) {
                 console.log("Yeah")
                 if (body) {
                     var $ = cheerio.load(body),
-                        companies_det = $('h2.mb0');
+                        companies_det = $('.bg-eso-lightblue h2.mb0');
                     return companies_det;
                     //companies_det_arr.push(companies_det);
                     //--counter;
