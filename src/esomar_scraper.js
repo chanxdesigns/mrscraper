@@ -6,8 +6,7 @@ var mongoose = require('mongoose'),
     extractCountryDirPages = require('./esomar_workers/extractCountryDirPages'),
     extractCountryCompanyPages = require('./esomar_workers/extractCountryCompanyPages'),
     extractAllCompaniesInfo = require('./esomar_workers/extractAllCompaniesInfo'),
-    extractAndStoreCompanies = require('./esomar_workers/extractAndStoreCompanies'),
-    storeToDb = require('./esomar_workers/storeToDb');
+    extractAndStoreCompanies = require('./esomar_workers/extractAndStoreCompanies');
 //mail = require('./mailer');
 
 var Queue = require('bull');
