@@ -5,8 +5,6 @@
  * Built with Love by Chanx Singha <chanx.designs@gmail.com>
  */
 
-'use strict';
-
 var express = require('express'),
     bodyParser = require('body-parser'),
     winston = require('winston'),
@@ -31,22 +29,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 // Homepage
 app.get('/', function (req, res) {
-   res.render('home');
+    res.render('home');
 });
 
 // Extract Esomar Companies
 app.get('/esomar/extract-companies', function (req, res) {
-    scraper.extract(res, function (data) {
-        res.setHeader('content-type', 'text/plain');
-        res.send(data);
-    });
+    scraper.extractCompanies();
+    res.setHeader('content-type', 'text/html');
+    res.send('<h3 style="font-family: Open Sans, sans-serif">Extraction in Progress, You will receive an E-Mail after extraction is completed.</h3>');
 });
 
 // Extract Esomar E-Mail
 app.get('/esomar/extract-email', function (req, res) {
-    scraper.extractEmail(res, function (data) {
-        res.send(data);
-    })
+    // scraper.extractEmail(res, function (data) {
+    //     res.send(data);
+    // })
 });
 
 // Extract Bluebook
@@ -87,12 +84,12 @@ app.post('/submit', function (req, res) {
 // Download E-MAILS List CSV File
 app.get('/:directory/download', function (req, res) {
     csv(req.params.directory, function (file_url) {
-        var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="'+file_url+'">Download</a>';
+        var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="' + file_url + '">Download</a>';
         res.send(html);
     })
 });
 
 // Start Request Listening
-app.listen(process.env.PORT || 5000,function () {
+app.listen(process.env.PORT || 5000, function () {
     console.log("App started responding")
 });
