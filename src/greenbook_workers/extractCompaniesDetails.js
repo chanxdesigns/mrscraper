@@ -24,11 +24,10 @@ function extractCompaniesDetails(companies_list) {
                     country: company.country,
                     directory: 'Greenbook',
                     company_name: $('.box-title h2').text().trim(),
-                    company_url: url
+                    company_url: url ? url : '404'
                 });
 
                 --counter;
-                console.log(counter);
                 if (!counter) storeToDb(companies_details);
             }
         })

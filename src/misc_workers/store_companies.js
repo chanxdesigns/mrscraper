@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-    DB = require('./dbconn');
+    DB = require('./dbconn'),
+    Mailer = require('./mailer');
 
 function storeCompaniesData (datas) {
     if (datas) {
@@ -16,7 +17,7 @@ function storeCompaniesData (datas) {
                 if (err) console.log(err.message);
                 --counter;
                 console.log('Saving Now: '+counter);
-                if (!counter) console.log('Saving Complete')
+                if (!counter) Mailer.send('Greenbook Extraction Complete', 'Company extraction of Greenbook Directory Complete', 'info@c-research.in');
             })
         })
     }
