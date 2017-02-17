@@ -18,8 +18,6 @@ function extractCompaniesDetails(companies_list) {
                         url = rawUrlArr[0] === 'http:' || rawUrlArr[0] === 'https:' ? rawUrlArr.splice(2).join('/') : rawUrl
                 }
 
-                //console.log(url);
-
                 companies_details.push({
                     country: company.country,
                     directory: 'Greenbook',
