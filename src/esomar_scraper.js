@@ -1,37 +1,13 @@
 var mongoose = require('mongoose'),
-    request = require('request'),
-    //Rp = require('request-promise'),
-    //cheerio = require('cheerio'),
     DB = require('./dbconn'),
-    extractCountryDirPages = require('./esomar_workers/extractCountryDirPages'),
-    extractCountryCompanyPages = require('./esomar_workers/extractCountryCompanyPages'),
-    extractAllCompaniesInfo = require('./esomar_workers/extractAllCompaniesInfo'),
-    extractAndStoreCompanies = require('./esomar_workers/extractAndStoreCompanies');
-//mail = require('./mailer');
+    Queue = require('bull'),
+    extractCountryDirPages = require('./esomar_workers/extractCountryDirPages');
 
-var Queue = require('bull');
-
-var directory = {dir: "esomar", dirname: "Esomar", url: "directory.esomar.org"};
-
-var esomarWorker = Queue('Esomar Extract', 'redis://h:pffc3ab707f46c10f7b417658a3503dd4e85a823dafc6ccffa3c2dcf69f1a7e0d@ec2-34-198-196-38.compute-1.amazonaws.com:30179');
+var directory = {dir: "esomar", dirname: "Esomar", url: "directory.esomar.org"},
+    esomarWorker = Queue('Esomar Extract', 'redis://h:pffc3ab707f46c10f7b417658a3503dd4e85a823dafc6ccffa3c2dcf69f1a7e0d@ec2-34-198-196-38.compute-1.amazonaws.com:30179');
 
 esomarWorker.process(function (dir) {
     extractCountryDirPages(dir.data)
-        .then(function (countriesEsomarUrl) {
-            return Promise.all(extractCountryCompanyPages(countriesEsomarUrl));
-        })
-        .then(function (country_company_pages) {
-            return Promise.all(extractAllCompaniesInfo(country_company_pages));
-        })
-        .then (function (companiesElem) {
-            return Promise.all(extractAndStoreCompanies(companiesElem));
-        })
-        .then(function (company_url) {
-            console.log(company_url)
-        })
-        .catch(function (err) {
-            console.log(err.message);
-        })
 });
 
 function extractCompanies() {
