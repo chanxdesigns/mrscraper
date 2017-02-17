@@ -7,7 +7,7 @@
 
 var express = require('express'),
     bodyParser = require('body-parser'),
-    winston = require('winston'),
+    DB = require('./src/misc_workers/dbconn'),
     esomar = require('./src/esomar_scraper'),
     bluebook = require('./src/bluebook_scraper'),
     greenbook = require('./src/greenbook_scraper'),
@@ -113,5 +113,6 @@ app.get('/:directory/download', function (req, res) {
  * Start Request Listening
  */
 app.listen(process.env.PORT || 5000, function () {
-    console.log("App started responding")
+    DB.makeDbConn();
+    console.log('App and Database started')
 });

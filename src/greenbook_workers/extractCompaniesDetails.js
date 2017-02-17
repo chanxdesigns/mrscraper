@@ -1,5 +1,6 @@
 var Rp = require('request'),
-    cheerio = require('cheerio');
+    cheerio = require('cheerio'),
+    storeToDb = require('../misc_workers/store_companies');
 
 function extractCompaniesDetails(companies_list) {
     var companies_details = [],
@@ -17,7 +18,7 @@ function extractCompaniesDetails(companies_list) {
                         url = rawUrlArr[0] === 'http:' || rawUrlArr[0] === 'https:' ? rawUrlArr.splice(2).join('/') : rawUrl
                 }
 
-                console.log(url);
+                //console.log(url);
 
                 companies_details.push({
                     country: company.country,
@@ -27,7 +28,8 @@ function extractCompaniesDetails(companies_list) {
                 });
 
                 --counter;
-                if (!counter) console.log(companies_details + "Counter 0. All Extracted");
+                console.log(counter);
+                if (!counter) storeToDb(companies_details);
             }
         })
     })
