@@ -13,6 +13,7 @@ function extractAllCompanies (countries_companies_pages) {
                 var $ = cheerio.load(body),
                     companies_det = $('.bg-eso-lightblue h2.mb0');
                 companies_list.push(companies_det);
+                console.log(companies_list.length);
             }
         })
     });

@@ -4,6 +4,7 @@ var Rp = require('request'),
 
 function extractCountryDirPages (directory) {
     Rp('https://'+directory.url, function (err, res, body) {
+        //console.log(body);
         if (body) {
             // Extract Countries Continents
             var $ = cheerio.load(body),
