@@ -4,21 +4,31 @@ var Rp = require('request'),
 function extractCompaniesDetails(companies_list) {
     var companies_details = [],
         counter = companies_list.length;
+
     companies_list.forEach(function (company) {
         Rp(company.company_gb_url, function (err, res, body) {
             if (err) console.log(err.message);
-            var $ = cheerio.load(body);
+            if (body) {
+                var $ = cheerio.load(body),
+                    rawUrl = $($('#tab1 .span4 > .desc-list')[1]).find('a').text();
 
-            companies_details.push({
-                country: company.country,
-                company_name: $('.box-title h2').text(),
-                company_url: $($('#tab1 .span4 > .desc-list')[1]).find('a').text()
-            });
+                if (rawUrl) {
+                    var rawUrlArr = rawUrl.split('/'),
+                        url = rawUrlArr[0] === 'http:' || rawUrlArr[0] === 'https:' ? rawUrlArr.splice(2).join('/') : rawUrl
+                }
 
-            console.log(companies_details);
+                console.log(url);
 
-            --counter;
-            if (!counter) console.log(companies_details + "Counter 0. All Extracted");
+                companies_details.push({
+                    country: company.country,
+                    directory: 'Greenbook',
+                    company_name: $('.box-title h2').text().trim(),
+                    company_url: url
+                });
+
+                --counter;
+                if (!counter) console.log(companies_details + "Counter 0. All Extracted");
+            }
         })
     })
 }

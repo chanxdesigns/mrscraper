@@ -2,7 +2,7 @@ var request = require('request'),
     Rp = require('request-promise'),
     cheerio = require('cheerio'),
     mongoose = require('mongoose'),
-    DB = require('./dbconn');
+    DB = require('./misc_workers/dbconn');
 
 var bluebook = {
     name: "Bluebook",

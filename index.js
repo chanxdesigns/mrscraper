@@ -11,8 +11,8 @@ var express = require('express'),
     esomar = require('./src/esomar_scraper'),
     bluebook = require('./src/bluebook_scraper'),
     greenbook = require('./src/greenbook_scraper'),
-    csv = require('./src/csv_maker'),
-    api_keys = require('./src/api_keys');
+    csv = require('./src/misc_workers/csv_maker'),
+    api_keys = require('./src/misc_workers/api_keys');
 
 // Initialize Express
 var app = express();

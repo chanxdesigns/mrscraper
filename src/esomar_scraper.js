@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-    DB = require('./dbconn'),
+    DB = require('./misc_workers/dbconn'),
     Queue = require('bull'),
     extractCountryDirPages = require('./esomar_workers/extractCountryDirPages');
 
