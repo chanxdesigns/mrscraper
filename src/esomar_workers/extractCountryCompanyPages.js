@@ -9,7 +9,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
     console.log(counter, countriesEsomarUrl);
 
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
-        Rp(countryEsomarUrl.esomar_url, function (err, res, body) {
+        Rp({url: countryEsomarUrl.esomar_url, timeout: 30000}, function (err, res, body) {
             if (err) console.log(err.message);
             if (body) {
                 var $ = cheerio.load(body),
