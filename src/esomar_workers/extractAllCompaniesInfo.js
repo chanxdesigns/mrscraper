@@ -5,6 +5,8 @@ function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
         counter = countries_companies_pages.length;
 
+    console.log(counter);
+
     countries_companies_pages.forEach(function (country_company_page) {
         Rp(country_company_page.page, function (err, res, body) {
             if (err) console.log(err.message);
