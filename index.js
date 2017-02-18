@@ -11,6 +11,7 @@ var express = require('express'),
     esomar = require('./src/esomar_scraper'),
     bluebook = require('./src/bluebook_scraper'),
     greenbook = require('./src/greenbook_scraper'),
+    emails = require('./src/misc_workers/extract_emails'),
     csv = require('./src/misc_workers/csv_maker'),
     api_keys = require('./src/misc_workers/api_keys');
 
@@ -43,11 +44,7 @@ app.get('/esomar/extract-companies', function (req, res) {
 /**
  * Extract Esomar E-Mail
  */
-app.get('/esomar/extract-emails', function (req, res) {
-    // esomar.extractEmail(res, function (data) {
-    //     res.send(data);
-    // })
-});
+
 
 /**
  * Extract Greenbook Companies
@@ -56,6 +53,13 @@ app.get('/greenbook/extract-companies', function (req, res) {
     greenbook();
     res.setHeader('content-type', 'text/html');
     res.send('<h3 style="font-family: Open Sans, sans-serif">Extraction in Progress, You will receive an E-Mail after extraction is completed.</h3>');
+});
+
+/**
+ * Extract Emails
+ */
+app.get('/:directory/extract-emails', function (req, res) {
+    emails(req.params.directory);
 });
 
 /**

@@ -18,8 +18,8 @@ function storeCompaniesData (datas) {
                 --counter;
                 console.log('Saving Now: '+counter);
                 if (!counter) Mailer.send('Greenbook Extraction Complete', 'Company extraction of Greenbook Directory Complete. You may now complete extracting email by visiting http://mrscraper.heroku.com/greenbook/extract-emails', 'info@c-research.in');
-            })
-        })
+            });
+        });
     }
 }
 
