@@ -13,7 +13,7 @@ function storeEmail (companies) {
     var query,
         Api = Mongoose.model('ApiKeys', DB.apiKeySchema),
         EmailCollection = Mongoose.model('CompaniesEmails', DB.companyEmailSchema),
-        counter = companies.length;
+        counter = 5;
 
     companies.forEach(function (company) {
         function getKey () {
