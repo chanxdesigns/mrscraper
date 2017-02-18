@@ -4,7 +4,6 @@ var Rp = require('request'),
 
 function extractCountryDirPages (directory) {
     Rp('https://'+directory.url, function (err, res, body) {
-        //console.log(body);
         if (body) {
             // Extract Countries Continents
             var $ = cheerio.load(body),
@@ -12,31 +11,31 @@ function extractCountryDirPages (directory) {
                 cn_asia = $('#content-location_asia_pacific li').splice(0),
                 cn_north_america = $('#content-location_north_america li').splice(0);
 
-            // Get Company List
-            var companies = [];
+            // Get Country Directory List
+            var country_dir = [];
 
             cn_europe.forEach(function (europe) {
-                companies.push({
+                country_dir.push({
                     country_name: $(europe).find('a').html().split('(')[0].trim(),
                     esomar_url: 'https://' + directory.url + '/' + $(europe).find('a').attr('href')
                 });
             });
 
             cn_asia.forEach(function (asia) {
-                companies.push({
+                country_dir.push({
                     country_name: $(asia).find('a').html().split('(')[0].trim(),
                     esomar_url: 'https://' + directory.url + '/' + $(asia).find('a').attr('href')
                 });
             });
 
             cn_north_america.forEach(function (n_america) {
-                companies.push({
+                country_dir.push({
                     country_name: $(n_america).find('a').html().split('(')[0].trim(),
                     esomar_url: 'https://' + directory.url + '/' + $(n_america).find('a').attr('href')
                 });
             });
-
-            extractCountryCompanyPages(companies);
+            // Run Country Company Pages Extraction
+            extractCountryCompanyPages(country_dir);
         }
     })
 }

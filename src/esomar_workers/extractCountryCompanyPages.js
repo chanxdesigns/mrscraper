@@ -6,6 +6,8 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
     var counter = countriesEsomarUrl.length,
         country_company_pages = [];
 
+    console.log(counter, countriesEsomarUrl);
+
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
         Rp(countryEsomarUrl.esomar_url, function (err, res, body) {
             if (body) {

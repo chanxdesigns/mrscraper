@@ -35,7 +35,7 @@ app.get('/', function (req, res) {
  * Extract Esomar Companies
  */
 app.get('/esomar/extract-companies', function (req, res) {
-    esomar.extractCompanies();
+    esomar();
     res.setHeader('content-type', 'text/html');
     res.send('<h3 style="font-family: Open Sans, sans-serif">Extraction in Progress, You will receive an E-Mail after extraction is completed.</h3>');
 });
