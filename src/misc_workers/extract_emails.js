@@ -24,7 +24,6 @@ function storeEmail (companies) {
                     Rp(query, function (err, res, body) {
                         if (err) console.log(err.message + "Here it is");
                         if (body) {
-                            console.log(body);
                             var hunterObj = JSON.parse(body);
                             if (hunterObj.errors) {
                                 Api.findOneAndUpdate(
@@ -46,6 +45,7 @@ function storeEmail (companies) {
                                             url = query;
                                         }
                                         Rp(url, function (err, res, body) {
+                                            console.log(body + 'Inside paginate RP');
                                             if (err) console.log(err.message);
                                             if (body) {
                                                 var paginate_value = JSON.parse(body);
@@ -72,7 +72,7 @@ function storeEmail (companies) {
                                                     function (err, res) {
                                                         if (err) console.log(err.message);
                                                         else {
-                                                            console.log(res);
+                                                            console.log('Inserted ' +res);
                                                             offset += 10;
                                                             if (offset >= hunterObj.meta.results) --counter;
                                                             if (!counter) Mailer.send(company.directory + ': Email Extraction Complete', 'Email extraction complete. You may now download by clicking here https://mrscraper.herokuapp.com/'+company.directory.toLowerCase()+'/download','info@c-research.in');
