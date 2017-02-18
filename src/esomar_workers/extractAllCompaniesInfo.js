@@ -8,7 +8,7 @@ function extractAllCompanies (countries_companies_pages) {
     console.log(counter + " Extract All Companies Info");
 
     countries_companies_pages.forEach(function (country_company_page) {
-        Rp(country_company_page.page, function (err, res, body) {
+        Rp({url: country_company_page.page, timeout: 300000}, function (err, res, body) {
             if (err) console.log(err.message);
             if (body) {
                 var $ = cheerio.load(body),
