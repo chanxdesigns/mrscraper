@@ -20,7 +20,7 @@ function storeEmail (companies) {
             Api.findOne({'usage': true})
                 .exec(function (err, apikey) {
                     if (err) console.log(err.message);
-                    query = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + apikey.key;
+                    query = 'https://api.hunter.io/v2/domain-search?domain=http://' + company.company_url + '&api_key=' + apikey.key;
                     Rp(query, function (err, res, body) {
                         if (err) console.log(err.message + "Here it is");
                         if (body) {
