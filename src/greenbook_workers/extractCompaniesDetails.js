@@ -11,7 +11,9 @@ function extractCompaniesDetails(companies_list) {
             if (err) console.log(err.message);
             if (body) {
                 var $ = cheerio.load(body),
-                    rawUrl = $($('#tab1 .span4 > .desc-list')[1]).find('a').text();
+                    spanUrl = $($('#tab1 .span4 > .desc-list')[1]).find('span.bold').text().trim(),
+                    hrefUrl = $($('#tab1 .span4 > .desc-list')[1]).find('a').text().trim(),
+                    rawUrl = spanUrl ? spanUrl : hrefUrl;
 
                 if (rawUrl) {
                     var rawUrlArr = rawUrl.split('/'),
