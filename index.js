@@ -43,7 +43,7 @@ app.get('/esomar/extract-companies', function (req, res) {
 /**
  * Extract Esomar E-Mail
  */
-app.get('/esomar/extract-email', function (req, res) {
+app.get('/esomar/extract-emails', function (req, res) {
     // esomar.extractEmail(res, function (data) {
     //     res.send(data);
     // })
