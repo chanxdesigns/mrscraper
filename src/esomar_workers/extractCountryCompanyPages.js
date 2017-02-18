@@ -9,7 +9,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
     console.log(counter, countriesEsomarUrl);
 
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
-        Rp({url: countryEsomarUrl.esomar_url, timeout: 30000}, function (err, res, body) {
+        Rp({url: countryEsomarUrl.esomar_url, timeout: 300000}, function (err, res, body) {
             if (err) console.log(err.message);
             if (body) {
                 var $ = cheerio.load(body),
@@ -20,7 +20,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
                     country_company_pages.push($(page_elem).attr('href'));
                 });
                 --counter;
-                console.log(counter)
+                console.log(counter, country_company_pages);
                 if (!counter) extractAllCompaniesInfo(country_company_pages);
             }
         })
