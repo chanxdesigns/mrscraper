@@ -69,9 +69,10 @@ function storeEmail (companies) {
                                                         }
                                                     },
                                                     {new: true, upsert: true},
-                                                    function (err) {
+                                                    function (err, res) {
                                                         if (err) console.log(err.message);
                                                         else {
+                                                            console.log(res);
                                                             offset += 10;
                                                             if (offset >= hunterObj.meta.results) --counter;
                                                             if (!counter) Mailer.send(company.directory + ': Email Extraction Complete', 'Email extraction complete. You may now download by clicking here https://mrscraper.herokuapp.com/'+company.directory.toLowerCase()+'/download','info@c-research.in');
