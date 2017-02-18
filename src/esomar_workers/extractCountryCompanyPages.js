@@ -6,8 +6,6 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
     var counter = countriesEsomarUrl.length,
         country_company_pages = [];
 
-    console.log(counter, countriesEsomarUrl);
-
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
         Rp({url: countryEsomarUrl.esomar_url, timeout: 300000}, function (err, res, body) {
             if (err) console.log(err.message);
@@ -17,10 +15,13 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
 
                 //var country_company_pages = [];
                 pages_elem.forEach(function (page_elem) {
-                    country_company_pages.push($(page_elem).attr('href'));
+                    country_company_pages.push({
+                        country: countryEsomarUrl.country_name,
+                        page: $(page_elem).attr('href')
+                    });
                 });
                 --counter;
-                console.log(counter, country_company_pages);
+                console.log('Fetching Country Companies Pagination: ' + counter, country_company_pages);
                 if (!counter) extractAllCompaniesInfo(country_company_pages);
             }
         })
