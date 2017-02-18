@@ -10,6 +10,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
 
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
         Rp(countryEsomarUrl.esomar_url, function (err, res, body) {
+            if (err) console.log(err.message);
             if (body) {
                 var $ = cheerio.load(body),
                     pages_elem = $('.mt0.mb0-5.pt0').find('a').not('.active').splice(0);
