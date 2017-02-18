@@ -104,7 +104,7 @@ function storeEmail (companies) {
  */
 function extractEmail (dir) {
     if (!dir) throw Error('No Directory Specified');
-    EmailExtractorWorker = Queue('Email Extractor', 6379, '127.0.0.1');
+    EmailExtractorWorker = Queue('Email Extractor', process.env.REDIS_URL);
 
     EmailExtractorWorker.process(function (dir) {
 
