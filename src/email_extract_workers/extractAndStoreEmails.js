@@ -12,11 +12,15 @@ var Rp = require('request'),
 function getEmail (api_array, companies) {
     "use strict";
 
-    var api_array = api_array;
+    var api_array = api_array,
+        EmailCollection = Mongoose.model('CompaniesEmails', DB.companyEmailSchema),
+        counter = companies.length;
+
     api_array.forEach(function (api, index) {
         companies.forEach(function (company) {
+            var offset = 0;
             function reloadApi() {
-                var uri = 'https://api.hunter.io/v2/domain-search?domain=http://' + company.company_url + '&api_key=' + api.usage ? api.key : false;
+                var uri = 'https://api.hunter.io/v2/domain-search?domain=http://' + company.company_url + '&api_key=' + api.usage ? api.key : false + "&offset="+offset;
                 Rp(uri, function (err, res, body) {
                     var mailObj = JSON.parse(body);
                     // If Errors returned i.e for Authentication, API limit reached
@@ -33,9 +37,41 @@ function getEmail (api_array, companies) {
                             // Search in the Email collection using the company url
                             // And update it with the latest information
                             // If not found, then insert as new item
-                            if (mailObj.meta.results > 10) {
-                                paginate(mailObj);
-                            }
+                            var offset = mailObj.meta.offset;
+                            EmailCollection.findOneAndUpdate(
+                                {company_url: company.company_url},
+                                {
+                                    country: company.country,
+                                    directory: company.directory,
+                                    company_name: company.company_name,
+                                    $addToSet: {
+                                        emails: {
+                                            $each: mailObj.data.emails.map(function (email) {
+                                                if (email.confidence > 40) return email.value;
+                                            })
+                                        },
+                                        names: {
+                                            $each: mailObj.data.emails.map(function (email) {
+                                                if (email.confidence > 40) return email.first_name+email.last_name;
+                                            })
+                                        }
+                                    }
+                                },
+                                {new: true, upsert: true},
+                                function (err, res) {
+                                    if (err) console.log(err.message);
+                                    else {
+                                        console.log('Inserted ' +res);
+                                        if (mailObj.meta.results > 10) {
+                                            offset += 10;
+                                            if (offset >= mailObj.meta.results) --counter;
+                                            if (!counter) Mailer.send(company.directory + ': Email Extraction Complete', 'Email extraction complete. You may now download by clicking here https://mrscraper.herokuapp.com/'+company.directory.toLowerCase()+'/download','info@c-research.in');
+                                            if (offset < mailObj.meta.results) reloadApi();
+                                            return;
+                                        }
+                                    }
+                                }
+                            );
                         }
                     }
                 })
@@ -43,41 +79,13 @@ function getEmail (api_array, companies) {
 
         });
     })
-
-    var EmailCollection = Mongoose.model('CompaniesEmails', DB.companyEmailSchema);
-    EmailCollection.findOneAndUpdate(
-        {company_url: company.company_url},
-        {
-            country: company.country,
-            directory: company.directory,
-            company_name: company.company_name,
-            $addToSet: {
-                emails: {
-                    $each: mailObj.data.emails.map(function (email) {
-                        if (email.confidence > 40) return email.value;
-                    })
-                },
-                names: {
-                    $each: mailObj.data.emails.map(function (email) {
-                        if (email.confidence > 40) return email.first_name+email.last_name;
-                    })
-                }
-            }
-        },
-        {new: true, upsert: true},
-        function (err, res) {
-            if (err) console.log(err.message);
-            else {
-                console.log('Inserted ' +res);
-                // offset += 10;
-                // if (offset >= hunterObj.meta.results) --counter;
-                // if (!counter) Mailer.send(company.directory + ': Email Extraction Complete', 'Email extraction complete. You may now download by clicking here https://mrscraper.herokuapp.com/'+company.directory.toLowerCase()+'/download','info@c-research.in');
-                // if (hunterObj.meta.results > 10 && offset < hunterObj.meta.results) paginate();
-            }
-        }
-    );
 }
 
+/**
+ * Store Emails to Database
+ *
+ * @param companies {Array}
+ */
 function storeEmail (companies) {
     "use strict";
 
