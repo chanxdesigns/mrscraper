@@ -20,7 +20,9 @@ function getEmails(companies) {
         apis.forEach(function (api) {
             "use strict";
             if (api.usage) {
-                console.log(api.key);
+                companies.forEach(function (company) {
+                    //
+                })
             }
         });
     })
