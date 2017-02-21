@@ -1,7 +1,7 @@
 var Mongoose = require('mongoose'),
     DB = require('./dbconn'),
     Queue = require('bull'),
-    storeEmail = require('../email_extract_workers/extractAndStoreEmails');
+    email = require('../email_extract_workers/extractAndStoreEmails');
 
 /**
  * Extract Email
@@ -22,7 +22,7 @@ function extractEmail (dir) {
             .find({directory: directory})
             .exec(function (err, companies) {
                 if (err) console.log(err.message);
-                storeEmail(companies);
+                email(companies);
             })
 
     });

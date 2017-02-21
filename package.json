@@ -8,6 +8,9 @@
   },
   "author": "Chanx Singha <chanx.designs@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": "7.5.0"
+  },
   "dependencies": {
     "aws-sdk": "^2.9.0",
     "bluebird": "^3.4.7",
