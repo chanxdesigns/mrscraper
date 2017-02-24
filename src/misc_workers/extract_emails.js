@@ -55,6 +55,7 @@ function getApi (key) {
             }
     })
 }
+
 var helpers = {
     offset: 0
 }
@@ -63,14 +64,14 @@ function getEmails (dir) {
     getApi().then(function (api) {
             extractCompanies(dir).then(function (companies) {
                 companies.forEach(function (company) {
-                    let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
-                    queryHunter(uri);
+                    queryHunter(company, api);
                 });
             });
     });
 }
 
-function queryHunter(uri, api) {
+function queryHunter(company, api) {
+    let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
     if (helpers.offset >= 10) uri += '&offset='+helpers.offset;
     Rp(uri, function (err, res, body) {
         if (body) {
@@ -82,6 +83,7 @@ function queryHunter(uri, api) {
             } else {
                 if (mailObj.data.emails.length) {
                     //
+                    if (mailObj.meta.results > 10) queryHunter(company,api)
                 }
             }
         }
