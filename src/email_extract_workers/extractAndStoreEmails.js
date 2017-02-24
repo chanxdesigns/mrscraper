@@ -75,7 +75,7 @@ function getEmails(companies) {
 
 function reloadApi () {
     "use strict";
-
+    getEmails();
 }
 
 function paginate(company, api, offset) {
@@ -84,7 +84,7 @@ function paginate(company, api, offset) {
         if (data) {
             let mailObj = JSON.parse(data);
             if (mailObj.errors) {
-
+                //
             }
         }
     })
