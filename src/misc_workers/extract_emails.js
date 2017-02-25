@@ -48,11 +48,11 @@ function getApi (key) {
         Api.findOneAndUpdate(
             {'key': key},
             {'usage': false},
-        ),
             function (err) {
                 if (err) return reject;
                 return resolve(1);
             }
+        )
     })
 }
 
