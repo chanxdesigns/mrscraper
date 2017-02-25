@@ -14,22 +14,25 @@ function generate (dir, callback) {
     var db;
     switch(dir) {
         case "esomar":
-            db = 'CompaniesEmail';
+            db = 'Companies';
+            break;
+        case "greenbook":
+            db = 'Companies';
             break;
         case "bluebook":
             db = 'BlueBookMail';
             break;
     }
-    var EmailCollection = mongoose.model(db, DB.companyEmailSchema);
-    var emails = EmailCollection.find({});
-    emails.exec(function (err, obj) {
+    var Companies = mongoose.model(db, DB.companySchema);
+    var comp = Companies.find({});
+    comp.exec(function (err, obj) {
         if (err) console.log(err);
         else {
-            var fields = ['directory', 'company_name', 'company_url', 'country', 'emails'];
-            var csv = json2csv({data: obj, fields: fields, unwindPath: 'emails'});
+            var fields = ['directory', 'company_name', 'company_url', 'country'];
+            var csv = json2csv({data: obj, fields: fields});
 
             var date = Date.now();
-            fs.writeFile('files/emails_'+ date +'.csv', csv, function(err) {
+            fs.writeFile('files/companies_'+ date +'.csv', csv, function(err) {
                 if (err) throw err;
                 var clientOptions = {
                     accessKeyId: "AKIAJFBO2N5FZEARJXYA",
@@ -40,16 +43,16 @@ function generate (dir, callback) {
 
                 var params = {
                     Bucket: 'mrscraper',
-                    Key: 'files/emails_'+ date +'.csv',
-                    Body: fs.readFileSync('files/emails_'+ date +'.csv'),
+                    Key: 'files/companies_'+ date +'.csv',
+                    Body: fs.readFileSync('files/companies_'+ date +'.csv'),
                     ACL: 'public-read'
                 };
 
                 // Upload file to S3
                 s3.putObject(params, function (err) {
                     if (err) throw err;
-                    fs.unlink('files/emails_'+ date +'.csv');
-                    callback('https://s3.ap-south-1.amazonaws.com/mrscraper/files/emails_'+ date +'.csv');
+                    fs.unlink('files/companies_'+ date +'.csv');
+                    callback('https://s3.ap-south-1.amazonaws.com/mrscraper/files/companies_'+ date +'.csv');
                 });
             });
         }

@@ -28,7 +28,7 @@ EventsEmitter.on('complete', function () {
  *
  */
 var workers = {
-    extractWorker: Queue('Extract', 6379, '127.0.0.1')
+    extractWorker: Queue('Extract', process.env.REDIS_URL)
 }
 
 workers.extractWorker.process(workerCb);
