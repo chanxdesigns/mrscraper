@@ -42,24 +42,12 @@ app.get('/esomar/extract-companies', function (req, res) {
 });
 
 /**
- * Extract Esomar E-Mail
- */
-
-
-/**
  * Extract Greenbook Companies
  */
 app.get('/greenbook/extract-companies', function (req, res) {
     greenbook();
     res.setHeader('content-type', 'text/html');
     res.send('<h3 style="font-family: Open Sans, sans-serif">Extraction in Progress, You will receive an E-Mail after extraction is completed.</h3>');
-});
-
-/**
- * Extract Emails
- */
-app.get('/:directory/extract-emails', function (req, res) {
-    emails(req.params.directory);
 });
 
 /**
@@ -79,13 +67,20 @@ app.get('/bluebook/extract-email', function (req, res) {
 });
 
 /**
- * Download Companies
+ * Extract Emails
  */
-app.get('/get-companies', function (req, res) {
-    esomar.getCompanies(function (companies) {
-        res.send(companies);
-    })
+app.get('/:directory/extract-emails', function (req, res) {
+    emails(req.params.directory, (data) => {
+        "use strict";
+        res.send(data)
+    });
 });
+
+/**-----------------------------------------------------------------------------
+ |
+ |  Extra Functions Other Than The Main
+ |
+ |----------------------------------------------------------------------------*/
 
 /**
  * Api Keys
@@ -104,7 +99,7 @@ app.post('/submit', function (req, res) {
 });
 
 /**
- * Download E-MAILS List CSV File
+ * Download Companies List CSV File
  */
 app.get('/:directory/download', function (req, res) {
     csv(req.params.directory, function (file_url) {
@@ -114,7 +109,7 @@ app.get('/:directory/download', function (req, res) {
 });
 
 /**
- * Start Request Listening
+ * Start HTTP Server Request Listening
  */
 app.listen(process.env.PORT || 5000, function () {
     DB.makeDbConn();

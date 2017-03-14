@@ -3,7 +3,7 @@ var email = require('emailjs');
 function sendMail (sub, msg, to) {
     var server 	= email.server.connect({
         user:    "info@c-research.in",
-        password:"$}_F8z_=sF5p",
+        password:"i$b$@DIg$P6.",
         host:    "md-in-23.webhostbox.net",
         ssl:     true
     });

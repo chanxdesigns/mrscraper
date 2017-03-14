@@ -35,7 +35,6 @@ workers.extractWorker.process(workerCb);
 
 function workerCb (job, done) {
         "use strict";
-        //console.log(job);
 }
 
 // var extract_tracker = function () {
