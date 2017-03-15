@@ -65,43 +65,81 @@ function getEmails (dir, cb) {
     getApi().then(function (api) {
         extractCompanies(dir).then(function (companies) {
             let counter = companies.length;
-            companies.forEach((company) => {
-                if (company.company_url != 404) {
-                    let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
-                    Rp(uri, (err, res, body) => {
-                        if (body) {
-                            let mailObj = JSON.parse(body);
-                            if (mailObj.errors) {
-                                getApi(api.key).then(function (data) {
-                                    if (data) queryHunter(uri, api);
-                                })
-                            } else {
-                                if (mailObj.data.emails.length) {
-                                    mailObj.data.emails;
-                                    --counter;
-                                    if (!counter) {
-                                        Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','info@c-research.in');
-                                        cb('Extraction Completed');
+            companies.forEach(company => {
+                function mails (api) {
+                    if (company.company_url != 404) {
+                        let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
+                        Rp(uri, (err, res, body) => {
+                            if (err) console.log(err.message);
+                            if (body) {
+                                let mailObj = JSON.parse(body);
+                                if (mailObj.errors) {
+                                    getApi(api.key)
+                                        .then(function (data) {
+                                            if (data) {
+                                                getApi()
+                                                    .then(api => {
+                                                        mails(api);
+                                                    })
+                                                    .catch(err => {
+                                                        console.log("Fails to get API: "+err.message);
+                                                    })
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.log(err.message);
+                                        });
+                                } else {
+                                    if (mailObj.data.emails.length) {
+                                        const CompaniesEmails = Mongoose.model('CompaniesEmails', DB.companyEmailSchema);
+                                        CompaniesEmails.findOneAndUpdate(
+                                            {
+                                                company_url: company.company_url,
+                                                company_name: company.company_name
+                                            },
+                                            {
+                                                country: company.country,
+                                                directory: company.directory,
+                                                $addToSet: {
+                                                    emails: {
+                                                        $each: mailObj.data.emails.map(function (email) {
+                                                            if (email.confidence > 40) return email.value;
+                                                        })
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                upsert: true,
+                                                new: true
+                                            },
+                                            err => {
+                                                if (!err) {
+                                                    --counter;
+                                                    if (!counter) {
+                                                        Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','info@c-research.in');
+                                                        cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
+                                                    }
+                                                }
+                                            }
+                                        )
+                                    }
+                                    else {
+                                        --counter;
                                     }
                                 }
-                                else {
-                                    --counter;
-                                }
                             }
-                        }
-                    });
+                            else {
+                                console.log("No Body");
+                            }
+                        });
+                    }
                 }
+                mails(api);
                 console.log(company.company_url);
             });
         });
     });
 }
-
-function queryHunter(company, api) {
-
-}
-
-
 
 module.exports = getEmails;
 
