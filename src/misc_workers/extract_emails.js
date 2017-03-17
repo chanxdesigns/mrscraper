@@ -133,6 +133,9 @@ function getEmails (dir, cb) {
                             }
                         });
                     }
+                    else {
+                        console.log("No Link");
+                    }
                 }
                 mails(api);
                 console.log(company.company_url);
