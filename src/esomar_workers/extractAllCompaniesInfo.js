@@ -21,7 +21,7 @@ function extractAllCompanies (countries_companies_pages) {
                 });
 
                 --counter;
-                console.log('Extracting Company Esomar URL: '+counter, companies_list);
+                console.log('Extracting Company Esomar URL: ' + counter, companies_list);
                 if (!counter) console.log('Extract complete', companies_list);
             }
         })
