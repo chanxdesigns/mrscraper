@@ -1,25 +1,25 @@
 var Rp = require('request-promise'),
     cheerio = require('cheerio'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    DB = require('../misc_workers/dbconn');
 
 mongoose.Promise = require('bluebird');
 
 function extractAndStoreCompanies (companies_elem) {
-    var companies_elem_arr = [];
-    companies_elem.forEach(function (company_elems) {
-            companies_elem_arr.push(company_elems);
-    });
+    // var companies_elem_arr = [];
+    // companies_elem.forEach(function (company_elems) {
+    //         companies_elem_arr.push(company_elems);
+    // });
 
-    return companies_elem_arr.map(function (company_elem) {
+    return companies_elem.map(function (company_elem) {
         if (company_elem) {
-            var $ = cheerio.load(company_elem);
-            var company_esomar_url = $(company_elem).find('a').attr('href');
-
-            return Rp(company_esomar_url)
+            return Rp(company_elem.company_esomar_url)
                 .then(function (body) {
-                    var $ = cheerio.load(body),
-                        compUrl = $('a[data-ga-category="website"]').attr('href');
-                    return compUrl;
+                    if (body) {
+                        var $ = cheerio.load(body),
+                            compUrl = $('a[data-ga-category="website"]').attr('href');
+                        return compUrl;
+                    }
                 })
                 .then(function (compUrl) {
                     console.log(compUrl);
@@ -31,8 +31,8 @@ function extractAndStoreCompanies (companies_elem) {
                         .then(function (data) {
                             if (!data) {
                                 var Email = new Companies({
-                                    country: val.country_name,
-                                    directory: getDirectory('esomar').dirname,
+                                    country: company_elem.country,
+                                    directory: 'Esomar',
                                     company_name: $('h1.uppercase.mb0').text().trim(),
                                     company_url: compUrl
                                 });

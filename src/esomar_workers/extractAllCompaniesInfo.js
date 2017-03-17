@@ -1,5 +1,7 @@
 var Rp = require('request'),
-    cheerio = require('cheerio');
+    cheerio = require('cheerio'),
+    storeEmails = require('./extractAndStoreCompanies'),
+    Mailer = require('../misc_workers/mailer');
 
 function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
@@ -22,7 +24,17 @@ function extractAllCompanies (countries_companies_pages) {
 
                 --counter;
                 console.log('Extracting Company Esomar URL: ' + counter, companies_list);
-                if (!counter) console.log('Extract complete', companies_list);
+                if (!counter) {
+                    Promise.all(storeEmails(companies_list))
+                        .then((data) => {
+                            console.log(data);
+                            Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete','info@c-research.in');
+                        })
+                        .catch((err) => {
+                            Mailer.send('Oops: Very Bad', 'Something Nasty Happened, Error: ' + err.message, 'info@c-research.in');
+                        });
+                }
+                //console.log('Extract complete', companies_list);
             }
         })
     });
