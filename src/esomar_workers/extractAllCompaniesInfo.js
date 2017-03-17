@@ -7,8 +7,6 @@ function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
         counter = countries_companies_pages.length;
 
-    console.log(counter + " Extract All Companies Info");
-
     countries_companies_pages.forEach(function (country_company_page) {
         Rp({url: country_company_page.page, timeout: 300000}, function (err, res, body) {
             if (err) console.log(err.message);
