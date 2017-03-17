@@ -3,7 +3,7 @@ var Queue = require('bull'),
 
 function extractCompanies() {
     var directory = {dir: "esomar", dirname: "Esomar", url: "directory.esomar.org"},
-        esomarWorker = Queue('Esomar Extract', 6379, '127.0.0.1');
+        esomarWorker = Queue('Esomar Extract', process.env.REDIS_URL);
 
     esomarWorker.process(function (dir) {
         //console.log(dir.data);
