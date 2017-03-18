@@ -19,15 +19,15 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
             // On Stream end
             res.on('end', () => {
                 if (body) {
-                    var $ = cheerio.load(body),
-                        pages_elem = $('.mt0.mb0-5.pt0').find('a').not('.active').splice(0);
-
-                    pages_elem.forEach(function (page_elem) {
-                        country_company_pages.push({
-                            country: countryEsomarUrl.country_name,
-                            page: $(page_elem).attr('href')
-                        });
-                    });
+                    // var $ = cheerio.load(body),
+                    //     pages_elem = $('.mt0.mb0-5.pt0').find('a').not('.active').splice(0);
+                    //
+                    // pages_elem.forEach(function (page_elem) {
+                    //     country_company_pages.push({
+                    //         country: countryEsomarUrl.country_name,
+                    //         page: $(page_elem).attr('href')
+                    //     });
+                    // });
                     --counter;
                     console.log('Fetching Country Companies Pagination: ' + counter);
                     if (!counter) extractAllCompaniesInfo(country_company_pages);
