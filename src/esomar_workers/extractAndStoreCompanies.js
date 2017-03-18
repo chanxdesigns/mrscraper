@@ -1,9 +1,10 @@
 var Rp = require('request-promise'),
     cheerio = require('cheerio'),
     mongoose = require('mongoose'),
-    DB = require('../misc_workers/dbconn');
+    Bb = require('bluebird'),
+    DB = require('../misc_workers/dbconn')
 
-mongoose.Promise = require('bluebird');
+mongoose.Promise = Bb;
 
 function extractAndStoreCompanies (companies_elem) {
     // var companies_elem_arr = [];
@@ -36,10 +37,14 @@ function extractAndStoreCompanies (companies_elem) {
                                     company_name: $('h1.uppercase.mb0').text().trim(),
                                     company_url: compUrl
                                 });
-                                Email.save(function (err, res) {
-                                    if (err) return err.message;
-                                    return res;
-                                })
+
+                                new Bb(function(resolve, reject) {
+                                    "use strict";
+                                    Email.save(function (err, res) {
+                                        if (err) return reject(err.message);
+                                        return resolve(res);
+                                    });
+                                });
                             }
                         })
                         .catch(function (err) {
