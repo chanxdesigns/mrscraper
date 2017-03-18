@@ -9,6 +9,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
         country_company_pages = [];
 
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
+        console.log(countryEsomarUrl);
         Rp(countryEsomarUrl.esomar_url, function (err, res, body) {
             if (err) console.log(err);
             if (body) {
