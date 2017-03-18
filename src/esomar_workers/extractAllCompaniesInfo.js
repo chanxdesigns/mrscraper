@@ -3,6 +3,8 @@ var Rp = require('request'),
     storeEmails = require('./extractAndStoreCompanies'),
     Mailer = require('../misc_workers/mailer');
 
+require('longjohn');
+
 function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
         counter = countries_companies_pages.length;

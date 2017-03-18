@@ -2,6 +2,8 @@ var Rp = require('request'),
     cheerio = require('cheerio'),
     extractAllCompaniesInfo = require('./extractAllCompaniesInfo');
 
+require('longjohn');
+
 function extractCountryCompanyPages(countriesEsomarUrl) {
     var counter = countriesEsomarUrl.length,
         country_company_pages = [];
