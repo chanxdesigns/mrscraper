@@ -29,7 +29,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
                         });
                     });
                     --counter;
-                    console.log('Fetching Country Companies Pagination: ' + counter, country_company_pages);
+                    console.log('Fetching Country Companies Pagination: ' + counter);
                     if (!counter) extractAllCompaniesInfo(country_company_pages);
                 }
             })
