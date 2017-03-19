@@ -23,16 +23,16 @@ function extractAllCompanies (countries_companies_pages) {
                     });
 
                     --counter;
-                    console.log('Extracting Company Esomar URL: ' + counter);
+                    //console.log('Extracting Company Esomar URL: ' + counter);
                     if (!counter) {
-                        // Promise.all(storeEmails(companies_list))
-                        //     .then((data) => {
-                        //         console.log(data);
-                        //         Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete','info@c-research.in');
-                        //     })
-                        //     .catch((err) => {
-                        //         Mailer.send('Oops: Very Bad', 'Something Nasty Happened, Error: ' + err.message, 'info@c-research.in');
-                        //     });
+                        Promise.all(storeEmails(companies_list))
+                            .then((data) => {
+                                console.log(data);
+                                Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete','info@c-research.in');
+                            })
+                            .catch((err) => {
+                                Mailer.send('Oops: Very Bad', 'Something Nasty Happened, Error: ' + err.message, 'info@c-research.in');
+                            });
                         console.log('Extract complete', companies_list);
                     }
                 }
