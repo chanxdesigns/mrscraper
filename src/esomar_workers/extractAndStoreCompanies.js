@@ -7,11 +7,6 @@ var Rp = require('request-promise'),
 mongoose.Promise = Bb;
 
 function extractAndStoreCompanies (companies_elem) {
-    // var companies_elem_arr = [];
-    // companies_elem.forEach(function (company_elems) {
-    //         companies_elem_arr.push(company_elems);
-    // });
-
     return companies_elem.map(function (company_elem) {
         if (company_elem) {
             return Rp(company_elem.company_esomar_url)

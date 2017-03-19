@@ -9,7 +9,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
         country_company_pages = [];
 
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
-        https.get({url: countryEsomarUrl.esomar_url, timeout: 60000}, res => {
+        https.get(countryEsomarUrl.esomar_url, res => {
             // Stream data holder e.g HTML Body
             let body;
             // On Stream available
