@@ -18,10 +18,9 @@ function extractAndStoreCompanies (companies_elem) {
                     }
                 })
                 .then(function (compUrl) {
-                    console.log(compUrl);
 
                     var Companies = mongoose.model('Companies', DB.companySchema);
-                    var c_promises = Companies.findOne({company_url: compUrl}).exec();
+                    var c_promises = Companies.findOne({company_url: compUrl, company_name: company_elem.company_name}).exec();
 
                     return c_promises
                         .then(function (data) {
