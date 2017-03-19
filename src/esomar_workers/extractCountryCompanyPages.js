@@ -9,7 +9,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
         country_company_pages = [];
 
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
-        Rp({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: countryEsomarUrl.esomar_url}}, function (err, res, body) {
+        Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: countryEsomarUrl.esomar_url}}, function (err, res, body) {
             console.log(body);
             if (err) console.log(err);
             if (body) {
