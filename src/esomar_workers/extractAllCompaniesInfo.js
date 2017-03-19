@@ -33,7 +33,7 @@ function extractAllCompanies (countries_companies_pages) {
                             .catch((err) => {
                                 Mailer.send('Oops: Very Bad', 'Something Nasty Happened, Error: ' + err.message, 'info@c-research.in');
                             });
-                        console.log('Extract complete', companies_list);
+                        //console.log('Extract complete', companies_list);
                     }
                 }
         })
