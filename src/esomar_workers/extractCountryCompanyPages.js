@@ -10,7 +10,6 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
 
     countriesEsomarUrl.forEach(function (countryEsomarUrl) {
         Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: countryEsomarUrl.esomar_url}}, function (err, res, body) {
-            console.log(body);
             if (err) console.log(err);
             if (body) {
                 var $ = cheerio.load(body),

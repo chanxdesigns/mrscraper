@@ -6,7 +6,6 @@ const Rp = require('request'),
 //require('longjohn');
 
 function extractAllCompanies (countries_companies_pages) {
-    console.log(countries_companies_pages);
     var companies_list = [],
         counter = countries_companies_pages.length;
 
