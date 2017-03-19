@@ -1,4 +1,4 @@
-const https = require('https'),
+const Rp = require('request'),
     cheerio = require('cheerio'),
     storeEmails = require('./extractAndStoreCompanies'),
     Mailer = require('../misc_workers/mailer');
@@ -11,16 +11,8 @@ function extractAllCompanies (countries_companies_pages) {
         counter = countries_companies_pages.length;
 
     countries_companies_pages.forEach(function (country_company_page) {
-        https.get(country_company_page.page, res => {
-            "use strict";
-            // Stream data holder e.g HTML Body
-            let body;
-            // On Stream available
-            res.on('data', data => {
-                body += data;
-            });
-            // On Stream end
-            res.on('end', () => {
+        Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: country_company_page.page}}, (err,res,body) => {
+            if (err) console.log(err.message);
                 if (body) {
                     var $ = cheerio.load(body),
                         companies_det = $('.bg-eso-lightblue h2.mb0');
@@ -32,7 +24,7 @@ function extractAllCompanies (countries_companies_pages) {
                     });
 
                     --counter;
-                    console.log('Extracting Company Esomar URL: ' + counter, companies_list);
+                    console.log('Extracting Company Esomar URL: ' + counter);
                     if (!counter) {
                         // Promise.all(storeEmails(companies_list))
                         //     .then((data) => {
@@ -42,15 +34,10 @@ function extractAllCompanies (countries_companies_pages) {
                         //     .catch((err) => {
                         //         Mailer.send('Oops: Very Bad', 'Something Nasty Happened, Error: ' + err.message, 'info@c-research.in');
                         //     });
+                        console.log('Extract complete', companies_list);
                     }
-                    //console.log('Extract complete', companies_list);
                 }
-            });
         })
-            .on('error', (err) => {
-                "use strict";
-                console.error(err);
-            });
         // Rp({url: country_company_page.page, timeout: 300000}, function (err, res, body) {
         //     if (err) console.log(err.message);
         //     if (body) {

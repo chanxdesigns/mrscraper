@@ -9,7 +9,7 @@ mongoose.Promise = Bb;
 function extractAndStoreCompanies (companies_elem) {
     return companies_elem.map(function (company_elem) {
         if (company_elem) {
-            return Rp(company_elem.company_esomar_url)
+            return Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: company_elem.company_esomar_url}})
                 .then(function (body) {
                     if (body) {
                         var $ = cheerio.load(body),
