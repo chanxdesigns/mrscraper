@@ -24,7 +24,7 @@ function extractAndStoreCompanies (companies_elem) {
                     all_c_web_elem.push({
                         name: company_elem.company_name,
                         country: company_elem.country,
-                        website: $('a[data-ga-category="website"]').attr('href').trim()
+                        website: !undefined ? $('a[data-ga-category="website"]').attr('href') : '404'
                     });
                 }
                 --counter;
