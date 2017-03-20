@@ -5,6 +5,7 @@ var Rp = require('request-promise'),
     //DB = require('../misc_workers/dbconn')
 
 function extractAndStoreCompanies (companies_elem) {
+    console.log(companies_elem);
     return companies_elem.map(function (company_elem) {
         if (company_elem) {
             var options = {
