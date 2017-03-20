@@ -19,6 +19,7 @@ function extractAllCompanies (countries_companies_pages) {
                         companies_det = $('.bg-eso-lightblue h2.mb0');
 
                     console.log(companies_det);
+                    console.log(companies_det.find('a').first().attr('href'));
 
                     companies_list.push({
                         country: country_company_page.country,
