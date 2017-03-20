@@ -35,7 +35,6 @@ function extractCountryDirPages (directory) {
                 });
             });
             // Run Country Company Pages Extraction
-            console.log(country_dir);
             extractCountryCompanyPages(country_dir);
         }
     })
