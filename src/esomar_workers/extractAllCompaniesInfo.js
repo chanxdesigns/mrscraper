@@ -46,6 +46,7 @@ function extractAllCompanies (countries_companies_pages) {
                 })
         }))
             .then(companies_list => {
+                console.log(companies_list);
                 var date = Date.now();
                 fs.writeFile('files/company_esomar_url_'+ date +'.json', JSON.stringify(companies_list), function () {
                     //"use strict";
