@@ -26,7 +26,7 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
                 //console.log('Fetching Country Companies Pagination: ' + counter, country_company_pages);
                 if (!counter) {
                     var date = Date.now();
-                    fs.writeFile('files/country_company_page_'+ date +'.json', JSON.stringify(companies_list), function () {
+                    fs.writeFile('files/country_company_page_'+ date +'.json', JSON.stringify(country_company_pages), function () {
                         //"use strict";
                         var clientOptions = {
                             accessKeyId: "AKIAJFBO2N5FZEARJXYA",
