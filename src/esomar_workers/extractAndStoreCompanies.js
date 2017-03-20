@@ -9,15 +9,8 @@ function extractAndStoreCompanies (companies_elem) {
         all_c_web_elem = [];
     companies_elem.forEach(function (company_elem) {
         if (company_elem) {
-            var options = {
-                method: "POST",
-                uri: "http://dashboard.i-apaconline.com/getsite",
-                form: {
-                    url: company_elem.company_esomar_url
-                }
-            };
-
             Rp.post({url: "http://dashboard.i-apaconline.com/getsite", form: {url: company_elem.company_esomar_url}}, (err, res, body) => {
+                console.log(body);
                 if (err) console.log(err.message);
                 if (body) {
                     var $ = cheerio.load(body);
