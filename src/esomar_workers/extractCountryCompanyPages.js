@@ -1,8 +1,9 @@
 const cheerio = require('cheerio'),
       extractAllCompaniesInfo = require('./extractAllCompaniesInfo'),
-      Rp = require('request');
-
-//require('longjohn');
+      Rp = require('request'),
+      fs = require('fs'),
+      Mailer = require('../misc_workers/mailer'),
+     AWS = require('aws-sdk');
 
 function extractCountryCompanyPages(countriesEsomarUrl) {
     var counter = countriesEsomarUrl.length,
@@ -22,8 +23,34 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
                     });
                 });
                 --counter;
-                console.log('Fetching Country Companies Pagination: ' + counter, country_company_pages);
-                if (!counter) extractAllCompaniesInfo(country_company_pages);
+                //console.log('Fetching Country Companies Pagination: ' + counter, country_company_pages);
+                if (!counter) {
+                    var date = Date.now();
+                    fs.writeFile('files/country_company_page_'+ date +'.json', JSON.stringify(companies_list), function () {
+                        //"use strict";
+                        var clientOptions = {
+                            accessKeyId: "AKIAJFBO2N5FZEARJXYA",
+                            secretAccessKey: "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",
+                            region: 'ap-south-1'
+                        };
+                        var s3 = new AWS.S3(clientOptions);
+
+                        var params = {
+                            Bucket: 'mrscraper',
+                            Key: 'files/country_company_page_'+ date +'.json',
+                            Body: fs.readFileSync('files/country_company_page_'+ date +'.json'),
+                            ACL: 'public-read'
+                        };
+
+                        // Upload file to S3
+                        s3.putObject(params, function (err) {
+                            if (err) throw err;
+                            fs.unlink('files/country_company_page_'+ date +'.json');
+                            Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete: https://s3.ap-south-1.amazonaws.com/mrscraper/files/'+'country_company_page_'+ date +'.json','info@c-research.in');
+                        });
+                    });
+                    extractAllCompaniesInfo(country_company_pages);
+                }
             }
         })
     })

@@ -32,7 +32,7 @@ function extractAllCompanies (countries_companies_pages) {
                     if (!counter) {
                         //storeEmails(companies_list);
                         var date = Date.now();
-                        fs.writeFile('files/name_'+ date +'.json', JSON.stringify(companies_list), function () {
+                        fs.writeFile('files/company_esomar_url_'+ date +'.json', JSON.stringify(companies_list), function () {
                             //"use strict";
                             var clientOptions = {
                                 accessKeyId: "AKIAJFBO2N5FZEARJXYA",
@@ -43,16 +43,16 @@ function extractAllCompanies (countries_companies_pages) {
 
                             var params = {
                                 Bucket: 'mrscraper',
-                                Key: 'files/name_'+ date +'.json',
-                                Body: fs.readFileSync('files/name_'+ date +'.json'),
+                                Key: 'files/company_esomar_url_'+ date +'.json',
+                                Body: fs.readFileSync('files/company_esomar_url_'+ date +'.json'),
                                 ACL: 'public-read'
                             };
 
                             // Upload file to S3
                             s3.putObject(params, function (err) {
                                 if (err) throw err;
-                                fs.unlink('files/name_'+ date +'.json');
-                                Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete','info@c-research.in');
+                                fs.unlink('files/company_esomar_url_'+ date +'.json');
+                                Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete: https://s3.ap-south-1.amazonaws.com/mrscraper/files/'+'company_esomar_url_'+ date +'.json','info@c-research.in');
                             });
                         });
                         // Promise.all(storeEmails(companies_list))
