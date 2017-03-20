@@ -17,11 +17,13 @@ function extractAllCompanies (countries_companies_pages) {
                     var $ = cheerio.load(body),
                         companies_det = $('.bg-eso-lightblue h2.mb0');
 
-                    companies_list.push({
-                        country: country_company_page.country,
-                        company_name: companies_det.find('a').first().text().trim(),
-                        company_esomar_url: companies_det.find('a').first().attr('href')
-                    });
+                    for (var i = 0; i < companies_det.length; i++) {
+                        companies_list.push({
+                            country: country_company_page.country,
+                            company_name: $(companies_det[i]).find('a').first().text().trim(),
+                            company_esomar_url: $(companies_det[i]).find('a').first().attr('href')
+                        });
+                    }
 
                     --counter;
                     //console.log('Extracting Company Esomar URL: ' + counter);
