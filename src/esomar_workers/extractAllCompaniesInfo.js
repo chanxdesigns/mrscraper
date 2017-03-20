@@ -11,9 +11,10 @@ function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
         counter;
 
-    fs.readFile(countries_companies_pages, pages => {
+    fs.readFile(countries_companies_pages, (err,pages) => {
         "use strict";
         console.log(pages);
+        console.log(pages.length);
         pages.forEach(function (country_company_page) {
             //console.log(country_company_page);
             Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: country_company_page.page}}, (err,res,body) => {
