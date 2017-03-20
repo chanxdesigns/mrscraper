@@ -25,7 +25,7 @@ function extractAndStoreCompanies (companies_elem) {
                 }
                 --counter;
                 if (!counter) {
-                    console.log(all_c_web_elem);
+                    //console.log(all_c_web_elem);
                 }
             });
         }
