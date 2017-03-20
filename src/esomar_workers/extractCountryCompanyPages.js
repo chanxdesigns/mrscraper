@@ -46,10 +46,9 @@ function extractCountryCompanyPages(countriesEsomarUrl) {
                         s3.putObject(params, function (err) {
                             if (err) throw err;
                             fs.unlink('files/country_company_page_'+ date +'.json');
-                            Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete: https://s3.ap-south-1.amazonaws.com/mrscraper/files/'+'country_company_page_'+ date +'.json','info@c-research.in');
+                            extractAllCompaniesInfo('https://s3.ap-south-1.amazonaws.com/mrscraper/files/'+'country_company_page_'+ date +'.json');
                         });
                     });
-                    extractAllCompaniesInfo(country_company_pages);
                 }
             }
         })
