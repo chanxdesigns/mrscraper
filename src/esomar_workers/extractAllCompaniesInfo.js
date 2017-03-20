@@ -32,7 +32,7 @@ function extractAllCompanies (countries_companies_pages) {
                     if (!counter) {
                         //storeEmails(companies_list);
                         var date = Date.now();
-                        fs.writeFile('/files/name.json', JSON.stringify(companies_list), function () {
+                        fs.writeFile('files/name.json', JSON.stringify(companies_list), function () {
                             //"use strict";
                             var clientOptions = {
                                 accessKeyId: "AKIAJFBO2N5FZEARJXYA",
