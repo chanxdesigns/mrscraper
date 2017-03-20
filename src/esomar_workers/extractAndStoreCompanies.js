@@ -5,7 +5,7 @@ var Rp = require('request-promise'),
     //DB = require('../misc_workers/dbconn')
 
 function extractAndStoreCompanies (companies_elem) {
-    companies_elem.forEach(function (company_elem) {
+    return companies_elem.map(function (company_elem) {
         if (company_elem) {
             var options = {
                 method: "POST",
@@ -15,7 +15,7 @@ function extractAndStoreCompanies (companies_elem) {
                 }
             };
 
-            Rp(options)
+            return Rp(options)
                 .then(body => {
                     if (body) {
                         var $ = cheerio.load(body);
