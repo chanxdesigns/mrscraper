@@ -9,13 +9,14 @@ function extractAndStoreCompanies (companies_elem) {
         all_c_web_elem = [];
 
     companies_elem.forEach(function (company_elem) {
-        console.log(company_elem.company_esomar_url);
+        //console.log(company_elem.company_esomar_url);
         if (company_elem) {
             Rp.post({url: "http://dashboard.i-apaconline.com/getsite", form: {url: company_elem.company_esomar_url}}, (err, res, body) => {
                 //console.log(body);
                 if (err) console.log(err.message);
                 if (body) {
                     var $ = cheerio.load(body);
+                    console.log($('a[data-ga-category="website"]').attr('href'));
                     all_c_web_elem.push({
                         name: company_elem.company_name,
                         country: company_elem.country,
