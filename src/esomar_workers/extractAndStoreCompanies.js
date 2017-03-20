@@ -17,7 +17,7 @@ function extractAndStoreCompanies (companies_elem) {
                 }
             };
 
-            Rp(options, (err, res, body) => {
+            Rp.post({url: "http://dashboard.i-apaconline.com/getsite", form: {url: company_elem.company_esomar_url}}, (err, res, body) => {
                 if (err) console.log(err.message);
                 if (body) {
                     var $ = cheerio.load(body);
