@@ -1,13 +1,11 @@
 var Rp = require('request-promise'),
     cheerio = require('cheerio'),
-    mongoose = require('mongoose'),
-    Bb = require('bluebird'),
-    DB = require('../misc_workers/dbconn')
-
-mongoose.Promise = Bb;
+    mongoose = require('mongoose');
+    //Bb = require('bluebird');
+    //DB = require('../misc_workers/dbconn')
 
 function extractAndStoreCompanies (companies_elem) {
-    return companies_elem.map(function (company_elem) {
+    companies_elem.forEach(function (company_elem) {
         if (company_elem) {
             var options = {
                 method: "POST",
@@ -16,18 +14,18 @@ function extractAndStoreCompanies (companies_elem) {
                     url: company_elem.company_esomar_url
                 }
             };
-            return Rp(options)
-                .then(function (body) {
+
+            Rp(options)
+                .then(body => {
                     if (body) {
-                        var $ = cheerio.load(body),
-                            compUrl = $('a[data-ga-category="website"]').attr('href');
-                        return compUrl;
+                        var $ = cheerio.load(body);
+                        return $('a[data-ga-category="website"]').attr('href');
                     }
                 })
-                .catch((err) => {
-                "use strict";
+                .catch(err => {
                     return err.message;
                 })
+
                 // .then(function (compUrl) {
                 //
                 //     var Companies = mongoose.model('Companies', DB.companySchema);
