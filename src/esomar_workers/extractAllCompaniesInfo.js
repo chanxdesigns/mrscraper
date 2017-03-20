@@ -9,11 +9,11 @@ const Rp = require('request'),
 
 function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
-        counter = countries_companies_pages.length;
+        counter;
 
     fs.readFile(countries_companies_pages, pages => {
         "use strict";
-        console.log(pages.length);
+        console.log(pages);
         pages.forEach(function (country_company_page) {
             //console.log(country_company_page);
             Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: country_company_page.page}}, (err,res,body) => {
