@@ -11,9 +11,9 @@ function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
         counter;
 
-    Rp(countries_companies_pages, (err,pages) => {
+    Rp(countries_companies_pages, (err,res,pages) => {
         "use strict";
-        console.log(pages);
+        console.log(JSON.parse(pages));
         console.log(pages.length);
         pages.forEach(function (country_company_page) {
             //console.log(country_company_page);
