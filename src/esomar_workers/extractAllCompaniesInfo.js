@@ -31,6 +31,7 @@ function extractAllCompanies (countries_companies_pages) {
                     //console.log('Extracting Company Esomar URL: ' + counter);
                     if (!counter) {
                         //storeEmails(companies_list);
+                        var date = Date.now();
                         fs.writeFile('/files/name.json', JSON.stringify(companies_list), function () {
                             //"use strict";
                             var clientOptions = {
@@ -50,7 +51,7 @@ function extractAllCompanies (countries_companies_pages) {
                             // Upload file to S3
                             s3.putObject(params, function (err) {
                                 if (err) throw err;
-                                fs.unlink('files/companies_'+ date +'.csv');
+                                fs.unlink('files/name_'+ date +'.json');
                                 Mailer.send('Esomar: Extraction and Storage Complete','Esomar Extraction & Storage Of Data Complete','info@c-research.in');
                             });
                         });
