@@ -11,7 +11,7 @@ function extractAllCompanies (countries_companies_pages) {
     var companies_list = [],
         counter;
 
-    fs.readFile(countries_companies_pages, (err,pages) => {
+    Rp(countries_companies_pages, (err,pages) => {
         "use strict";
         console.log(pages);
         console.log(pages.length);
