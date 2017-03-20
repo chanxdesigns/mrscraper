@@ -1,12 +1,13 @@
-var Rp = require('request-promise'),
+var Rp = require('request'),
     cheerio = require('cheerio'),
     mongoose = require('mongoose');
     //Bb = require('bluebird');
     //DB = require('../misc_workers/dbconn')
 
 function extractAndStoreCompanies (companies_elem) {
-    console.log(companies_elem);
-    return companies_elem.map(function (company_elem) {
+    var counter = companies_elem.length,
+        all_c_web_elem = [];
+    companies_elem.forEach(function (company_elem) {
         if (company_elem) {
             var options = {
                 method: "POST",
@@ -16,45 +17,21 @@ function extractAndStoreCompanies (companies_elem) {
                 }
             };
 
-            return Rp(options)
-                .then(body => {
-                    if (body) {
-                        var $ = cheerio.load(body);
-                        return $('a[data-ga-category="website"]').attr('href');
-                    }
-                })
-                .catch(err => {
-                    return err.message;
-                })
-
-                // .then(function (compUrl) {
-                //
-                //     var Companies = mongoose.model('Companies', DB.companySchema);
-                //     var c_promises = Companies.findOne({company_url: compUrl, company_name: company_elem.company_name}).exec();
-                //
-                //     return c_promises
-                //         .then(function (data) {
-                //             if (!data) {
-                //                 var Email = new Companies({
-                //                     country: company_elem.country,
-                //                     directory: 'Esomar',
-                //                     company_name: $('h1.uppercase.mb0').text().trim(),
-                //                     company_url: compUrl
-                //                 });
-                //
-                //                 new Bb(function(resolve, reject) {
-                //                     "use strict";
-                //                     Email.save(function (err, res) {
-                //                         if (err) return reject(err.message);
-                //                         return resolve(res);
-                //                     });
-                //                 });
-                //             }
-                //         })
-                //         .catch(function (err) {
-                //             return err.message;
-                //         });
-                // })
+            Rp(options, (err, res, body) => {
+                if (err) console.log(err.message);
+                if (body) {
+                    var $ = cheerio.load(body);
+                    all_c_web_elem.push({
+                        name: company_elem.company_name,
+                        country: company_elem.country,
+                        website: $('a[data-ga-category="website"]').attr('href').trim()
+                    });
+                }
+                --counter;
+                if (!counter) {
+                    console.log(all_c_web_elem);
+                }
+            });
         }
     })
 }
