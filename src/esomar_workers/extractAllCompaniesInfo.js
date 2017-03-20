@@ -14,12 +14,8 @@ function extractAllCompanies (countries_companies_pages) {
         Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: country_company_page.page}}, (err,res,body) => {
             if (err) console.log(err.message);
                 if (body) {
-                    //console.log(body);
                     var $ = cheerio.load(body),
                         companies_det = $('.bg-eso-lightblue h2.mb0');
-
-                    console.log(companies_det);
-                    console.log(companies_det.find('a').first().attr('href'));
 
                     companies_list.push({
                         country: country_company_page.country,
