@@ -10,6 +10,7 @@ function extractAllCompanies (countries_companies_pages) {
         counter = countries_companies_pages.length;
 
     countries_companies_pages.forEach(function (country_company_page) {
+        console.log(country_company_page);
         Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: country_company_page.page}}, (err,res,body) => {
             if (err) console.log(err.message);
                 if (body) {
