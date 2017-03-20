@@ -13,8 +13,8 @@ function extractAllCompanies (countries_companies_pages) {
 
     Rp(countries_companies_pages, (err,res,pages) => {
         "use strict";
-        console.log(JSON.parse(pages));
-        console.log(pages.length);
+        var pages = JSON.parse(pages);
+        console.log(counter = pages.length);
         pages.forEach(function (country_company_page) {
             //console.log(country_company_page);
             Rp.post({url: 'http://dashboard.i-apaconline.com/getsite', form: {url: country_company_page.page}}, (err,res,body) => {
