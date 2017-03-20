@@ -24,7 +24,7 @@ function extractAllCompanies (countries_companies_pages) {
                     url: country_company_page.page
                 }
             }
-            Rpr(options)
+            return Rpr(options)
                 .then(body => {
                     if (body) {
                         var $ = cheerio.load(body),
