@@ -28,7 +28,9 @@ function extractCompaniesDetails(companies_list) {
                 });
 
                 --counter;
-                if (!counter) storeToDb(companies_details);
+                if (!counter) storeToDb(companies_details, function () {
+                    console.log("Done");
+                });
             }
         })
     })

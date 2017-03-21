@@ -8,13 +8,12 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     DB = require('./src/misc_workers/dbconn'),
-    esomar = require('./src/esomar_scraper'),
     bluebook = require('./src/bluebook_scraper'),
     greenbook = require('./src/greenbook_scraper'),
+    store_comp = require('./src/misc_workers/store_companies'),
     emails = require('./src/misc_workers/extract_emails'),
     csv = require('./src/misc_workers/csv_maker'),
-    api_keys = require('./src/misc_workers/api_keys'),
-    multer = require('multer')();
+    api_keys = require('./src/misc_workers/api_keys')
 
 // Initialize Express
 var app = express();
@@ -31,15 +30,6 @@ app.use(bodyParser.urlencoded({extended: true}));
  */
 app.get('/', function (req, res) {
     res.render('home');
-});
-
-/**
- * Extract Esomar Companies
- */
-app.get('/esomar/extract-companies', function (req, res) {
-    esomar();
-    res.setHeader('content-type', 'text/html');
-    res.send('<h3 style="font-family: Open Sans, sans-serif">Extraction in Progress, You will receive an E-Mail after extraction is completed.</h3>');
 });
 
 /**
@@ -110,15 +100,16 @@ app.get('/:directory/download', function (req, res) {
 });
 
 /**
- * Parse Post
+ * Parse Esomar Post
  */
 app.post('/companies/submit', bodyParser.json(), function (req, res) {
     if (req.body) {
-        console.log(JSON.parse(req.body.data)[0].website);
-        //console.log("Parse "+JSON.parse(req.body));
+        var datas = JSON.parse(req.body.data);
+        store_comp(datas, function () {
+            res.set('Access-Control-Allow-Origin', '*');
+            res.status(200).send("complete");
+        })
     }
-    res.set('Access-Control-Allow-Origin', '*');
-    res.send(200);
 })
 
 /**
