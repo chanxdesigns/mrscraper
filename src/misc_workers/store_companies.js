@@ -21,7 +21,7 @@ function storeCompaniesData (datas, cb) {
                             --counter;
                             console.log('Saving Now: '+counter);
                             if (!counter) {
-                                Mailer.send(data.directory + ' Companies Storage Complete', 'Company extraction of '+ data.directory+' Directory Complete. You may now complete extracting email by visiting http://mrscraper.heroku.com/greenbook/extract-emails', 'info@c-research.in');
+                                Mailer.send(data.directory + ' ' + data.country + ' Companies Storage Complete', 'Company extraction of '+ data.directory+' Directory Complete. You may now complete extracting email by visiting http://mrscraper.heroku.com/greenbook/extract-emails', 'info@c-research.in');
                                 cb();
                             }
                         });
