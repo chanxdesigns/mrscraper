@@ -112,8 +112,13 @@ app.get('/:directory/download', function (req, res) {
 /**
  * Parse Post
  */
+app.use('/companies',function () {
+
+})
 app.post('/companies/submit', function (req, res) {
     console.log(req.body);
+    res.set('Access-Control-Expose-Headers: X-Chanx-Extract');
+    res.set('Access-Control-Allow-Methods: POST, GET, PUT');
     res.status(200).send('Yo');
 })
 
