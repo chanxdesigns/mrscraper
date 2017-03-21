@@ -24,7 +24,6 @@ app.set('view engine', 'pug');
 
 // Post Body Parser
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
 
 /**
  * Homepage
@@ -112,7 +111,7 @@ app.get('/:directory/download', function (req, res) {
 /**
  * Parse Post
  */
-app.post('/companies/submit', function (req, res) {
+app.post('/companies/submit', bodyParser.json(), function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
     res.send(req.body);//
 })
