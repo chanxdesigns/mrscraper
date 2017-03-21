@@ -115,8 +115,7 @@ app.get('/:directory/download', function (req, res) {
 app.post('/companies/submit', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
     if (req.body) {
-        var j = JSON.parse(req.body);
-        res.send(j);
+        res.send(req.body);
     }
 })
 
