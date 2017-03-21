@@ -26,6 +26,10 @@ function storeCompaniesData (datas, cb) {
                             }
                         });
                     }
+                    else {
+                        --counter;
+                        if (!counter) cb();
+                    }
                 })
         });
     }
