@@ -13,7 +13,8 @@ var express = require('express'),
     greenbook = require('./src/greenbook_scraper'),
     emails = require('./src/misc_workers/extract_emails'),
     csv = require('./src/misc_workers/csv_maker'),
-    api_keys = require('./src/misc_workers/api_keys');
+    api_keys = require('./src/misc_workers/api_keys'),
+    multer = require('multer')();
 
 // Initialize Express
 var app = express();
@@ -111,7 +112,7 @@ app.get('/:directory/download', function (req, res) {
 /**
  * Parse Post
  */
-app.post('/companies/submit', bodyParser.json(), function (req, res) {
+app.post('/companies/submit', multer.array(), function (req, res) {
     if (req.body) {
         console.log(req.body);
         //console.log("Parse "+JSON.parse(req.body));
