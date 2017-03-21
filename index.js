@@ -116,8 +116,6 @@ app.post('/companies/submit', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
     if (req.body) {
         console.log(req.body);
-        var body = JSON.parse(req.body);
-        console.log("Parsed: "+body);
         res.send(req.body);
     }
 })
