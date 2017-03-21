@@ -100,57 +100,42 @@ function getEmails (dir, cb) {
                                                         directory: company.directory,
                                                         company_name: company.company_name,
                                                         company_url: company.company_url,
-                                                        $addToSet: {
-                                                            emails: {
-                                                                $each: mailObj.data.emails.map(function (email) {
-                                                                    if (email.confidence > 40) return email.value;
-                                                                })
+                                                        emails: mailObj.data.emails.map(function (email) {
+                                                            if (email.confidence > 40) return email.value;
+                                                        }),
+                                                        names: mailObj.data.emails.map(function (email) {
+                                                            if (email.confidence > 40) {
+                                                                if (email.first_name) {
+                                                                    return email.last_name ? email.first_name + ' ' + email.last_name : email.first_name;
+                                                                }
+                                                                return '';
                                                             }
-                                                        }
+                                                        })
                                                     })
                                                     Email.save(function (err) {
                                                         if (err) console.log(err.message);
                                                         --counter;
                                                         if (!counter) {
-                                                            Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','info@c-research.in');
+                                                            Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','chppal50@gmail.com');
                                                             cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
                                                         }
                                                     })
                                                 }
+                                                else {
+                                                    --counter;
+                                                    if (!counter) {
+                                                        Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','chppal50@gmail.com');
+                                                        cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
+                                                    }
+                                                }
                                             })
-                                        // CompaniesEmails.findOneAndUpdate(
-                                        //     {
-                                        //         company_url: company.company_url,
-                                        //         company_name: company.company_name
-                                        //     },
-                                        //     {
-                                        //         country: company.country,
-                                        //         directory: company.directory,
-                                        //         $addToSet: {
-                                        //             emails: {
-                                        //                 $each: mailObj.data.emails.map(function (email) {
-                                        //                     if (email.confidence > 40) return email.value;
-                                        //                 })
-                                        //             }
-                                        //         }
-                                        //     },
-                                        //     {
-                                        //         upsert: true,
-                                        //         new: true
-                                        //     },
-                                        //     err => {
-                                        //         if (!err) {
-                                        //             --counter;
-                                        //             if (!counter) {
-                                        //                 Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','info@c-research.in');
-                                        //                 cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
-                                        //             }
-                                        //         }
-                                        //     }
-                                        // )
                                     }
                                     else {
                                         --counter;
+                                        if (!counter) {
+                                            Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','chppal50@gmail.com');
+                                            cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
+                                        }
                                     }
                                 }
                             }
@@ -161,10 +146,14 @@ function getEmails (dir, cb) {
                     }
                     else {
                         console.log("No Link");
+                        --counter;
+                        if (!counter) {
+                            Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','chppal50@gmail.com');
+                            cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
+                        }
                     }
                 }
                 mails(api);
-                console.log(company.company_url);
             });
         });
     });
