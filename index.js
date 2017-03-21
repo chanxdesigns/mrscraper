@@ -24,6 +24,7 @@ app.set('view engine', 'pug');
 
 // Post Body Parser
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 /**
  * Homepage
@@ -107,6 +108,14 @@ app.get('/:directory/download', function (req, res) {
         res.send(html);
     })
 });
+
+/**
+ * Parse Post
+ */
+app.post('/companies/submit', function (req, res) {
+    console.log(req.body);
+    res.status(200).send('Yo');
+})
 
 /**
  * Start HTTP Server Request Listening
