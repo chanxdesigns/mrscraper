@@ -112,9 +112,6 @@ app.get('/:directory/download', function (req, res) {
 /**
  * Parse Post
  */
-app.use('/companies',function () {
-
-})
 app.post('/companies/submit', function (req, res) {
     console.log(req.body);
     res.set('Access-Control-Expose-Headers: X-Chanx-Extract');
