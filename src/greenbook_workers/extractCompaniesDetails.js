@@ -29,7 +29,7 @@ function extractCompaniesDetails(companies_list) {
 
                 --counter;
                 if (!counter) storeToDb(companies_details, function () {
-                    console.log("Done");
+                    console.log("Done Storing");
                 });
             }
         })

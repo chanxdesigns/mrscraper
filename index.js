@@ -33,6 +33,19 @@ app.get('/', function (req, res) {
 });
 
 /**
+ * Extract Esomar Companies
+ */
+app.post('/companies/submit', bodyParser.json(), function (req, res) {
+    if (req.body) {
+        var datas = JSON.parse(req.body.data);
+        store_comp(datas, function () {
+            res.set('Access-Control-Allow-Origin', '*');
+            res.status(200).send("complete");
+        })
+    }
+})
+
+/**
  * Extract Greenbook Companies
  */
 app.get('/greenbook/extract-companies', function (req, res) {
@@ -63,7 +76,7 @@ app.get('/bluebook/extract-email', function (req, res) {
 app.get('/:directory/extract-emails', function (req, res) {
     emails(req.params.directory, (data) => {
         "use strict";
-        res.send(data)
+        res.send(data);
     });
 });
 
@@ -98,19 +111,6 @@ app.get('/:directory/download', function (req, res) {
         res.send(html);
     })
 });
-
-/**
- * Parse Esomar Post
- */
-app.post('/companies/submit', bodyParser.json(), function (req, res) {
-    if (req.body) {
-        var datas = JSON.parse(req.body.data);
-        store_comp(datas, function () {
-            res.set('Access-Control-Allow-Origin', '*');
-            res.status(200).send("complete");
-        })
-    }
-})
 
 /**
  * Start HTTP Server Request Listening

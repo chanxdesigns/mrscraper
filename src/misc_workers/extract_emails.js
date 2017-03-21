@@ -67,7 +67,7 @@ function getEmails (dir, cb) {
             let counter = companies.length;
             companies.forEach(company => {
                 function mails (api) {
-                    if (company.company_url != 404) {
+                    if (company.company_url != '404') {
                         let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
                         Rp(uri, (err, res, body) => {
                             if (err) console.log(err.message);
@@ -92,36 +92,62 @@ function getEmails (dir, cb) {
                                 } else {
                                     if (mailObj.data.emails.length) {
                                         const CompaniesEmails = Mongoose.model('CompaniesEmails', DB.companyEmailSchema);
-                                        CompaniesEmails.findOneAndUpdate(
-                                            {
-                                                company_url: company.company_url,
-                                                company_name: company.company_name
-                                            },
-                                            {
-                                                country: company.country,
-                                                directory: company.directory,
-                                                $addToSet: {
-                                                    emails: {
-                                                        $each: mailObj.data.emails.map(function (email) {
-                                                            if (email.confidence > 40) return email.value;
-                                                        })
-                                                    }
+                                        CompaniesEmails.findOne({'company_url':company.company_url},{'directory':company.directory})
+                                            .exec(function (err, res) {
+                                                if (!res) {
+                                                    var Email = new CompaniesEmails({
+                                                        country: company.country,
+                                                        directory: company.directory,
+                                                        company_name: company.company_name,
+                                                        company_url: company.company_url,
+                                                        $addToSet: {
+                                                            emails: {
+                                                                $each: mailObj.data.emails.map(function (email) {
+                                                                    if (email.confidence > 40) return email.value;
+                                                                })
+                                                            }
+                                                        }
+                                                    })
+                                                    Email.save(function (err) {
+                                                        if (err) console.log(err.message);
+                                                        --counter;
+                                                        if (!counter) {
+                                                            Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','info@c-research.in');
+                                                            cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
+                                                        }
+                                                    })
                                                 }
-                                            },
-                                            {
-                                                upsert: true,
-                                                new: true
-                                            },
-                                            err => {
-                                                if (!err) {
-                                                    --counter;
-                                                    if (!counter) {
-                                                        Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','info@c-research.in');
-                                                        cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
-                                                    }
-                                                }
-                                            }
-                                        )
+                                            })
+                                        // CompaniesEmails.findOneAndUpdate(
+                                        //     {
+                                        //         company_url: company.company_url,
+                                        //         company_name: company.company_name
+                                        //     },
+                                        //     {
+                                        //         country: company.country,
+                                        //         directory: company.directory,
+                                        //         $addToSet: {
+                                        //             emails: {
+                                        //                 $each: mailObj.data.emails.map(function (email) {
+                                        //                     if (email.confidence > 40) return email.value;
+                                        //                 })
+                                        //             }
+                                        //         }
+                                        //     },
+                                        //     {
+                                        //         upsert: true,
+                                        //         new: true
+                                        //     },
+                                        //     err => {
+                                        //         if (!err) {
+                                        //             --counter;
+                                        //             if (!counter) {
+                                        //                 Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','info@c-research.in');
+                                        //                 cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
+                                        //             }
+                                        //         }
+                                        //     }
+                                        // )
                                     }
                                     else {
                                         --counter;
