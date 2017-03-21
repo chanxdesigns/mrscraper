@@ -112,7 +112,7 @@ app.get('/:directory/download', function (req, res) {
 /**
  * Parse Post
  */
-app.post('/companies/submit', multer.array(), function (req, res) {
+app.post('/companies/submit', bodyParser.json(), function (req, res) {
     if (req.body) {
         console.log(req.body);
         //console.log("Parse "+JSON.parse(req.body));
