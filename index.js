@@ -113,9 +113,13 @@ app.get('/:directory/download', function (req, res) {
  * Parse Post
  */
 app.post('/companies/submit', function (req, res) {
-    console.log(req.body);
     res.set('Access-Control-Allow-Origin', '*');
-    res.status(200).send('Yo');
+    if (req.body) {
+        console.log(req.body);
+        var body = JSON.parse(req.body);
+        console.log("Parsed: "+body);
+        res.send(req.body);
+    }
 })
 
 /**

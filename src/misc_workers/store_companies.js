@@ -8,7 +8,7 @@ function storeCompaniesData (datas) {
         var CompaniesCollection = mongoose.model('Companies', DB.companySchema),
 
         // Counter for tracking loops
-            counter = datas.length;
+        counter = datas.length;
 
         // Loop through and store data
         datas.forEach(function (data) {
