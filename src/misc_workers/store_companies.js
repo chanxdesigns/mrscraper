@@ -12,7 +12,7 @@ function storeCompaniesData (datas, cb) {
 
         // Loop through and store data
         datas.forEach(function (data) {
-            CompaniesCollection.findOne({'company_url': data.company_url},{'directory': data.directory})
+            CompaniesCollection.findOne({company_name: data.company_name, company_url: data.company_url, directory: data.directory})
                 .exec(function (err, res) {
                     if (!res) {
                         var company = new CompaniesCollection(data);
