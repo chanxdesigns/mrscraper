@@ -12,7 +12,8 @@ var express = require('express'),
     greenbook = require('./src/greenbook_scraper'),
     store_comp = require('./src/misc_workers/store_companies'),
     emails = require('./src/misc_workers/extract_emails'),
-    csv = require('./src/misc_workers/csv_maker'),
+    companies_csv = require('./src/misc_workers/companies_csv'),
+    emails_csv = require('./src/misc_workers/emails_csv'),
     api_keys = require('./src/misc_workers/api_keys')
 
 // Initialize Express
@@ -106,11 +107,21 @@ app.post('/submit', function (req, res) {
  * Download Companies List CSV File
  */
 app.get('/:directory/download', function (req, res) {
-    csv(req.params.directory, function (file_url) {
+    companies_csv(req.params.directory, function (file_url) {
         var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="' + file_url + '">Download</a>';
         res.send(html);
     })
 });
+
+/**
+ * Download Emails List CSV File
+ */
+app.get('/:directory/download/emails', function (req, res) {
+    emails_csv(req.params.directory, function (file_url) {
+        var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="' + file_url + '">Download</a>';
+        res.send(html);
+    })
+})
 
 /**
  * Start HTTP Server Request Listening
