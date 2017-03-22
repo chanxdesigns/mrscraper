@@ -117,6 +117,7 @@ function getEmails (dir, cb) {
                                                     Email.save(function (err) {
                                                         if (err) console.log(err.message);
                                                         --counter;
+                                                        console.log("Saving: "+company.company_name+" "+counter);
                                                         if (!counter) {
                                                             Mailer.send('Extraction Completed', 'Extraction Of Emails and Saving Completed', 'chppal50@gmail.com');
                                                             cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
