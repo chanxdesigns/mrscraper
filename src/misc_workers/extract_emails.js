@@ -62,40 +62,42 @@ function getApi (key) {
 
 function getEmails (dir, cb) {
     "use strict";
+    const CompaniesEmails = Mongoose.model('CompaniesEmails', DB.companyEmailSchema);
+
     getApi().then(function (api) {
         extractCompanies(dir).then(function (companies) {
             let counter = companies.length;
             companies.forEach(company => {
                 function mails (api) {
                     if (company.company_url != '404') {
-                        let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
-                        Rp(uri, (err, res, body) => {
-                            if (err) console.log(err.message);
-                            if (body) {
-                                let mailObj = JSON.parse(body);
-                                if (mailObj.errors) {
-                                    getApi(api.key)
-                                        .then(function (data) {
-                                            if (data) {
-                                                getApi()
-                                                    .then(api => {
-                                                        mails(api);
+                        CompaniesEmails.findOne({directory: company.directory, company_url: company.company_url})
+                            .exec((err, res) => {
+                                if (err) console.log(err.message);
+                                if (!res) {
+                                    let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
+                                    Rp(uri, (err, res, body) => {
+                                        if (err) console.log(err.message);
+                                        if (body) {
+                                            let mailObj = JSON.parse(body);
+                                            if (mailObj.errors) {
+                                                getApi(api.key)
+                                                    .then(function (data) {
+                                                        if (data) {
+                                                            getApi()
+                                                                .then(api => {
+                                                                    mails(api);
+                                                                })
+                                                                .catch(err => {
+                                                                    console.log("Fails to get API: "+err.message);
+                                                                })
+                                                        }
                                                     })
                                                     .catch(err => {
-                                                        console.log("Fails to get API: "+err.message);
-                                                    })
-                                            }
-                                        })
-                                        .catch(err => {
-                                            console.log(err.message);
-                                        });
-                                } else {
-                                    if (mailObj.data.emails.length) {
-                                        const CompaniesEmails = Mongoose.model('CompaniesEmails', DB.companyEmailSchema);
-                                        CompaniesEmails.findOne({'company_url':company.company_url},{'directory':company.directory})
-                                            .exec(function (err, res) {
-                                                if (!res) {
-                                                    var Email = new CompaniesEmails({
+                                                        console.log(err.message);
+                                                    });
+                                            } else {
+                                                if (mailObj.data.emails.length) {
+                                                    const Email = new CompaniesEmails({
                                                         country: company.country,
                                                         directory: company.directory,
                                                         company_name: company.company_name,
@@ -116,7 +118,7 @@ function getEmails (dir, cb) {
                                                         if (err) console.log(err.message);
                                                         --counter;
                                                         if (!counter) {
-                                                            Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','chppal50@gmail.com');
+                                                            Mailer.send('Extraction Completed', 'Extraction Of Emails and Saving Completed', 'chppal50@gmail.com');
                                                             cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
                                                         }
                                                     })
@@ -128,21 +130,21 @@ function getEmails (dir, cb) {
                                                         cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
                                                     }
                                                 }
-                                            })
-                                    }
-                                    else {
-                                        --counter;
-                                        if (!counter) {
-                                            Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','chppal50@gmail.com');
-                                            cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
+                                            }
                                         }
+                                        else {
+                                            console.log("No Body");
+                                        }
+                                    });
+                                }
+                                else {
+                                    --counter;
+                                    if (!counter) {
+                                        Mailer.send('Extraction Completed','Extraction Of Emails and Saving Completed','chppal50@gmail.com');
+                                        cb(`Extraction Of Email Completed. Kindly Visit <a href="/esomar/download/emails">Download Now</a>`);
                                     }
                                 }
-                            }
-                            else {
-                                console.log("No Body");
-                            }
-                        });
+                            });
                     }
                     else {
                         console.log("No Link");
