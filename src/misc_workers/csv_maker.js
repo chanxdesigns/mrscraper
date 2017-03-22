@@ -24,7 +24,7 @@ function generate (dir, callback) {
             break;
     }
     var Companies = mongoose.model(db, DB.companySchema);
-    var comp = Companies.find({});
+    var comp = Companies.find({directory: dir[0].toUpperCase() + dir.substr(1)});
     comp.exec(function (err, obj) {
         if (err) console.log(err);
         else {
