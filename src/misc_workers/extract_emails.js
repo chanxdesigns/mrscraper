@@ -76,7 +76,7 @@ function getEmails (dir, cb) {
                                 if (!res) {
                                     let uri = 'https://api.hunter.io/v2/domain-search?domain=' + company.company_url + '&api_key=' + api.key;
                                     Rp(uri, (err, res, body) => {
-                                        if (err) console.log(err.message);
+                                        if (err) console.log(err.c);
                                         if (body) {
                                             let mailObj = JSON.parse(body);
                                             if (mailObj.errors) {

@@ -12,6 +12,7 @@ var express = require('express'),
     greenbook = require('./src/greenbook_scraper'),
     store_comp = require('./src/misc_workers/store_companies'),
     emails = require('./src/misc_workers/extract_emails'),
+    emails_v2 = require('./src/extract_mail_v2'),
     companies_csv = require('./src/misc_workers/companies_csv'),
     emails_csv = require('./src/misc_workers/emails_csv'),
     api_keys = require('./src/misc_workers/api_keys')
@@ -25,6 +26,7 @@ app.set('view engine', 'pug');
 
 // Post Body Parser
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static('public'));
 
 /**
  * Homepage
@@ -80,6 +82,15 @@ app.get('/:directory/extract-emails', function (req, res) {
         res.send(data);
     });
 });
+
+/**
+ * Extract Emails Secondary
+ */
+app.get('/extract/emails/v2/:directory', function (req, res) {
+    emails_v2(req.params.directory)
+        .then(data => res.send(data));
+    //res.send(200);
+})
 
 /**-----------------------------------------------------------------------------
  |
