@@ -6,108 +6,157 @@ var hunter = {
     mongoUri: mongodbBaseUri + `${db_name}/collections/apikeys`,
 
     /**
+     * Update exhausted hunter keys usage to {false}
+     * @param api
+     * @returns {Promise|Promise.<T>}
+     */
+    setHunterApiKeys: (api) => {
+        "use strict";
+        const key = `?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz`;
+        const opts = {
+            url: hunter.mongoUri + `/${api._id.$oid}` + key,
+            type: 'PUT',
+            data: JSON.stringify({"usage": false}),
+            contentType: "application/json"
+        }
+        return $.when($.ajax(opts))
+            .then(() => 1)
+            .catch(err => err);
+    },
+
+    /**
      * Get Hunter Api Keys where usage {true}
      * @returns {Promise|Promise.<T>}
      */
     getHunterApiKeys:  () => {
         "use strict";
         const uri = hunter.mongoUri + `?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"usage":true})}&fo=true`;
-        console.log(uri);
         return $.when($.get(uri))
-            .then(api => api, err => err.message);
-    },
-
-    /**
-     * Update exhausted hunter keys usage to {false}
-     * @param api
-     * @returns {Promise|Promise.<T>}
-     */
-    // setHunterApiKeys: (api) => {
-    //     "use strict";
-    //     const opts = {
-    //         uri: hunter.mongoUri + `/${api._id}`,
-    //         method: 'PUT',
-    //         body: {usage: false},
-    //         json: true,
-    //         qs: {
-    //             apiKey: process.env.MONGO_APIKEY || 'rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz'
-    //         }
-    //     }
-    //     return request(opts)
-    //         .then(() => {
-    //             return 1
-    //         })
-    //         .catch(err => err.message);
-    // }
+            .then(api => {
+                return $.get('https://api.hunter.io/v2/account/?api_key='+api.key)
+                    .then(user => {
+                        if (user.data.calls.used > user.data.calls.available) {
+                            return hunter.setHunterApiKeys(api)
+                                .then(() => {
+                                    return hunter.getHunterApiKeys()
+                                        .then(api => api)
+                                        .catch(err => err);
+                                })
+                                .catch(err => err);
+                        }
+                        return api;
+                    })
+                    .catch(err => err);
+            })
+            .catch(err => err);
+    }
 }
 
 function getCompanies (dir) {
     "use strict";
-    const uri = mongodbBaseUri + `${db_name}/collections/companies?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"directory":dir[0].toUpperCase()+dir.substr(1)})}&l=0`;
-    console.log(uri);
-    return $.when($.get(uri))
-        .then(data => data, err => err.message);
+    const uri = mongodbBaseUri + `${db_name}/collections/companies?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"directory":dir[0].toUpperCase()+dir.substr(1)})}&l=20`;
+    return $.get(uri);
 }
 
 function checkForAvailability (company,dir) {
     const uri = mongodbBaseUri + `${db_name}/collections/companiesemails?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"directory":dir[0].toUpperCase()+dir.substr(1), "company_url":company.company_url})}&fo=true`;
-    return $.when($.get(uri));
+    return $.get(uri);
 }
+
 getCompanies('esomar')
     .then(companies => {
         "use strict";
-        hunter.getHunterApiKeys()
-            .done(api => {
-                return companies.map(company => {
+        Promise.all(companies.map(company => {
+            return hunter.getHunterApiKeys()
+                .then(api => {
                     return checkForAvailability(company,'esomar')
                         .then(data => {
-                            if (!data) return "Yes";
+                            if (!data) {
+                                const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
+                                return $.get(uri)
+                                    .then(mailObj => mailObj.data)
+                                    .catch(d => {
+                                        if (d.responseJSON.errors) {
+                                            return d.responseJSON.errors[0].message;
+                                        }
+                                    });
+                            }
                         })
-                    //const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
+                        .then(mailObj => {
+                            if (mailObj === undefined) {
+                                console.log("Yes It Is");
+                            }
+                        });
                 })
-            })
-            .done(data => {
-                Promise.all(data)
-                    .then(data => console.log(data));
-            })
-    },
-    err => alert(err.message)
-    );
-
-// module.exports = function getEmails(dir) {
-//     return getCompanies(dir)
-//         .then(companies => {
-//             "use strict";
-//             return hunter.getHunterApiKeys()
-//                 .then(apikeys => {
-//                     return JSON.parse(apikeys);
-//                 })
-//                 .then(api => {
-//                     console.log(api)
-//                     return JSON.parse(companies).map(company => {
-//                         const opts = {
-//                             uri: 'https://api.hunter.io/v2/domain-search',
-//                             qs: {
-//                                 domain: company.company_url,
-//                                 api_key: api.key
-//                             },
-//                             timeout: 300000
+                .catch(err => err);
+        }))
+            .then(d => console.log(d));
+    })
+// function recursiveExtractMail (company, api) {
+//     "use strict";
+//     return checkForAvailability(company,'esomar')
+//         .then(data => {
+//             if (!data) {
+//                 const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
+//                 return $.get(uri)
+//                     .then(
+//                         mailObj => {
+//                             if (mailObj) {
+//                                 return mailObj
+//                             }
 //                         }
-//                         return request(opts)
-//                             .then(mailObj => {
-//                                 console.log('Nope');
-//                                 return "nopne man";
-//                             })
+//                     )
+//                     .catch(d => {
+//                         if (d.responseJSON.errors) {
+//                             hunter.getHunterApiKeys()
+//                                 .then()
+//                         }
+//                     });
+//             }
+//         })
+// }
+//
+// function getRecursiveEmails (company, api, usage) {
+//     "use strict";
+//     if (!usage) {
+//         return hunter.setHunterApiKeys(api)
+//             .then(() => {
+//                 return hunter.getHunterApiKeys()
+//                     .then(api => {
+//                         const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
+//                         return $.get(uri)
+//                             .then(
+//                                 mailObj => {
+//                                     if (mailObj) {
+//                                         return mailObj
+//                                     }
+//                                 }
+//                             )
 //                             .catch(err => {
-//                                 return err;
+//                                 if (err.responseJSON.errors) {
+//                                     return getRecursiveEmails(company,api,false);
+//                                 }
 //                             })
 //                     })
+//             })
+//             .catch()
+//     }
+//     return hunter.getHunterApiKeys()
+//         .then(api => {
+//             const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
+//             return $.get(uri)
+//                 .then(
+//                     mailObj => {
+//                         if (mailObj) {
+//                             return mailObj
+//                         }
+//                     }
+//                 )
+//                 .catch(err => {
+//                     if (err.responseJSON.errors) {
+//                         return getRecursiveEmails(company,api,false);
+//                     }
 //                 })
-//                 .then(mailObjsPromise => {
-//                     return Promise.all(mailObjsPromise)
-//                         .then(datas => datas);
-//                 })
-//                 .catch(err => err.message);
 //         })
-//         .catch(err => err.message);
 // }
+
