@@ -83,8 +83,8 @@ getCompanies('esomar')
                             }
                         })
                         .then(mailObj => {
-                            if (mailObj === undefined) {
-                                console.log("Yes It Is");
+                            if (mailObj) {
+                                console.log(mailObj);
                             }
                         });
                 })
