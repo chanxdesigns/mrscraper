@@ -75,53 +75,53 @@ getCompanies(location.search.substr(1).split('=')[1])
     .then(companies => {
         "use strict";
         Promise.all(companies.map(company => {
-            return hunter.getHunterApiKeys()
-                .then(api => {
-                    const uri = `https://api.hunter.io/v2/domain-search?domain=${protocolChecker(company.company_url)}&api_key=${api.key}`;
-                    console.log(uri)
-                    return checkForAvailability(company, location.search.substr(1).split('=')[1])
-                        .then(data => {
-                            if (!data) {
-                                const uri = `https://api.hunter.io/v2/domain-search?domain=${protocolChecker(company.company_url)}&api_key=${api.key}`;
-                                return $.get(uri)
-                                    .then(mailObj => mailObj.data)
-                                    .catch(d => {
-                                        if (d.responseJSON.errors) {
-                                            return d.responseJSON.errors[0].message;
-                                        }
-                                    });
-                            }
-                        })
-                        .then(mailObj => {
-                            if (mailObj && mailObj.emails.length) {
-                                const data = {
-                                    directory: company.directory,
-                                    country: company.country,
-                                    company_name: company.company_name,
-                                    company_url: company.company_url,
-                                    emails: mailObj.emails.reduce((value, mail) => {
-                                        if (mail.confidence > 40) value.push(mail.value);
-                                        return value;
-                                    }, []),
-                                    names: mailObj.emails.reduce((value, mail) => {
-                                        if (mail.confidence > 40) value.push(mail.last_name ? mail.first_name + " " + mail.last_name : mail.first_name);
-                                        return value;
-                                    }, [])
+            if (company.company_url !== "404") {
+                return hunter.getHunterApiKeys()
+                    .then(api => {
+                        return checkForAvailability(company, location.search.substr(1).split('=')[1])
+                            .then(data => {
+                                if (!data) {
+                                    const uri = `https://api.hunter.io/v2/domain-search?domain=${protocolChecker(company.company_url)}&api_key=${api.key}`;
+                                    return $.get(uri)
+                                        .then(mailObj => mailObj.data)
+                                        .catch(d => {
+                                            if (d.responseJSON.errors) {
+                                                return d.responseJSON.errors[0].message;
+                                            }
+                                        });
                                 }
-                                const opts = {
-                                    url: `${mongodbBaseUri}collections/companiesemails?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz`,
-                                    method: "POST",
-                                    data: JSON.stringify(data),
-                                    contentType: "application/json"
+                            })
+                            .then(mailObj => {
+                                if (mailObj && mailObj.emails.length) {
+                                    const data = {
+                                        directory: company.directory,
+                                        country: company.country,
+                                        company_name: company.company_name,
+                                        company_url: company.company_url,
+                                        emails: mailObj.emails.reduce((value, mail) => {
+                                            if (mail.confidence > 40) value.push(mail.value);
+                                            return value;
+                                        }, []),
+                                        names: mailObj.emails.reduce((value, mail) => {
+                                            if (mail.confidence > 40) value.push(mail.last_name ? mail.first_name + " " + mail.last_name : mail.first_name);
+                                            return value;
+                                        }, [])
+                                    }
+                                    const opts = {
+                                        url: `${mongodbBaseUri}collections/companiesemails?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz`,
+                                        method: "POST",
+                                        data: JSON.stringify(data),
+                                        contentType: "application/json"
+                                    }
+                                    return $.ajax(opts)
+                                        .then(() => "success")
+                                        .catch(err => err);
                                 }
-                                return $.ajax(opts)
-                                    .then(() => "success")
-                                    .catch(err => err);
-                            }
-                        })
-                        .catch(err => err);
-                })
-                .catch(err => err);
+                            })
+                            .catch(err => err);
+                    })
+                    .catch(err => err);
+            }
         }))
             .then(() => {
                 $.post(location.origin + '/notify/mail', {sub: location.search.substr(1).split('=')[1] + " Email extraction completed", msg: "Done extraction", to: "chppal50@gmail.com"})
