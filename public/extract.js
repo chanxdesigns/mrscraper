@@ -1,9 +1,9 @@
 const db_name = 'heroku_5lpx8nq1';
-const mongodbBaseUri = `https://api.mlab.com/api/1/databases/`;
+const mongodbBaseUri = `https://api.mlab.com/api/1/databases/${db_name}/`;
 
 var hunter = {
     /** Mongo URI **/
-    mongoUri: mongodbBaseUri + `${db_name}/collections/apikeys`,
+    mongoUri: mongodbBaseUri + `collections/apikeys`,
 
     /**
      * Update exhausted hunter keys usage to {false}
@@ -35,7 +35,7 @@ var hunter = {
             .then(api => {
                 return $.get('https://api.hunter.io/v2/account/?api_key='+api.key)
                     .then(user => {
-                        if (user.data.calls.used > user.data.calls.available) {
+                        if (user.data.calls.used >= user.data.calls.available) {
                             return hunter.setHunterApiKeys(api)
                                 .then(() => {
                                     return hunter.getHunterApiKeys()
@@ -54,25 +54,35 @@ var hunter = {
 
 function getCompanies (dir) {
     "use strict";
-    const uri = mongodbBaseUri + `${db_name}/collections/companies?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"directory":dir[0].toUpperCase()+dir.substr(1)})}&l=20`;
+    const uri = mongodbBaseUri + `collections/companies?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"directory":dir[0].toUpperCase()+dir.substr(1)})}&l=0`;
     return $.get(uri);
 }
 
 function checkForAvailability (company,dir) {
-    const uri = mongodbBaseUri + `${db_name}/collections/companiesemails?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"directory":dir[0].toUpperCase()+dir.substr(1), "company_url":company.company_url})}&fo=true`;
+    const uri = mongodbBaseUri + `collections/companiesemails?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz&q=${JSON.stringify({"directory":dir[0].toUpperCase()+dir.substr(1), "company_url":company.company_url})}&fo=true`;
     return $.get(uri);
 }
 
-getCompanies('esomar')
+function protocolChecker (url) {
+    let urlArr = url.split('//');
+    if (urlArr[0] == "http:" || urlArr[0] == "https:") {
+        return url;
+    }
+    return "http://" + url;
+}
+
+getCompanies(location.search.substr(1).split('=')[1])
     .then(companies => {
         "use strict";
         Promise.all(companies.map(company => {
             return hunter.getHunterApiKeys()
                 .then(api => {
-                    return checkForAvailability(company,'esomar')
+                    const uri = `https://api.hunter.io/v2/domain-search?domain=${protocolChecker(company.company_url)}&api_key=${api.key}`;
+                    console.log(uri)
+                    return checkForAvailability(company, location.search.substr(1).split('=')[1])
                         .then(data => {
                             if (!data) {
-                                const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
+                                const uri = `https://api.hunter.io/v2/domain-search?domain=${protocolChecker(company.company_url)}&api_key=${api.key}`;
                                 return $.get(uri)
                                     .then(mailObj => mailObj.data)
                                     .catch(d => {
@@ -83,80 +93,44 @@ getCompanies('esomar')
                             }
                         })
                         .then(mailObj => {
-                            if (mailObj) {
-                                console.log(mailObj);
+                            if (mailObj && mailObj.emails.length) {
+                                const data = {
+                                    directory: company.directory,
+                                    country: company.country,
+                                    company_name: company.company_name,
+                                    company_url: company.company_url,
+                                    emails: mailObj.emails.reduce((value, mail) => {
+                                        if (mail.confidence > 40) value.push(mail.value);
+                                        return value;
+                                    }, []),
+                                    names: mailObj.emails.reduce((value, mail) => {
+                                        if (mail.confidence > 40) value.push(mail.last_name ? mail.first_name + " " + mail.last_name : mail.first_name);
+                                        return value;
+                                    }, [])
+                                }
+                                const opts = {
+                                    url: `${mongodbBaseUri}collections/companiesemails?apiKey=rVegcqX22bCHAZzgfkhnrs9r6Nsbqlvz`,
+                                    method: "POST",
+                                    data: JSON.stringify(data),
+                                    contentType: "application/json"
+                                }
+                                return $.ajax(opts)
+                                    .then(() => "success")
+                                    .catch(err => err);
                             }
-                        });
+                        })
+                        .catch(err => err);
                 })
                 .catch(err => err);
         }))
-            .then(d => console.log(d));
+            .then(() => {
+                $.post(location.origin + '/notify/mail', {sub: location.search.substr(1).split('=')[1] + " Email extraction completed", msg: "Done extraction", to: "chppal50@gmail.com"})
+                    .then(d => {
+                        if (d === "success") {
+                            alert(location.search.substr(1).split('=')[1].toUpperCase() + " Email extraction completed");
+                        }
+                    })
+                    .catch(() => alert("Something nasty has happened"));
+            });
     })
-// function recursiveExtractMail (company, api) {
-//     "use strict";
-//     return checkForAvailability(company,'esomar')
-//         .then(data => {
-//             if (!data) {
-//                 const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
-//                 return $.get(uri)
-//                     .then(
-//                         mailObj => {
-//                             if (mailObj) {
-//                                 return mailObj
-//                             }
-//                         }
-//                     )
-//                     .catch(d => {
-//                         if (d.responseJSON.errors) {
-//                             hunter.getHunterApiKeys()
-//                                 .then()
-//                         }
-//                     });
-//             }
-//         })
-// }
-//
-// function getRecursiveEmails (company, api, usage) {
-//     "use strict";
-//     if (!usage) {
-//         return hunter.setHunterApiKeys(api)
-//             .then(() => {
-//                 return hunter.getHunterApiKeys()
-//                     .then(api => {
-//                         const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
-//                         return $.get(uri)
-//                             .then(
-//                                 mailObj => {
-//                                     if (mailObj) {
-//                                         return mailObj
-//                                     }
-//                                 }
-//                             )
-//                             .catch(err => {
-//                                 if (err.responseJSON.errors) {
-//                                     return getRecursiveEmails(company,api,false);
-//                                 }
-//                             })
-//                     })
-//             })
-//             .catch()
-//     }
-//     return hunter.getHunterApiKeys()
-//         .then(api => {
-//             const uri = `https://api.hunter.io/v2/domain-search?domain=${company.company_url}&api_key=${api.key}`;
-//             return $.get(uri)
-//                 .then(
-//                     mailObj => {
-//                         if (mailObj) {
-//                             return mailObj
-//                         }
-//                     }
-//                 )
-//                 .catch(err => {
-//                     if (err.responseJSON.errors) {
-//                         return getRecursiveEmails(company,api,false);
-//                     }
-//                 })
-//         })
-// }
-
+.catch(() => alert('Something very terrible happened while retrieving companies list. This need fixation immediately.'));

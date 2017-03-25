@@ -13,6 +13,7 @@ var express = require('express'),
     store_comp = require('./src/misc_workers/store_companies'),
     emails = require('./src/misc_workers/extract_emails'),
     emails_v2 = require('./src/extract_mail_v2'),
+    mailer = require('./src/misc_workers/mailer'),
     companies_csv = require('./src/misc_workers/companies_csv'),
     emails_csv = require('./src/misc_workers/emails_csv'),
     api_keys = require('./src/misc_workers/api_keys')
@@ -76,20 +77,17 @@ app.get('/bluebook/extract-email', function (req, res) {
 /**
  * Extract Emails
  */
-app.get('/:directory/extract-emails', function (req, res) {
-    emails(req.params.directory, (data) => {
-        "use strict";
-        res.send(data);
-    });
+app.get('/extract-emails', function (req, res) {
+    res.render('extract-email');
 });
 
 /**
- * Extract Emails Secondary
+ * Notify Mail After Mail Extraction
+ * Based On jQuery Extraction
  */
-app.get('/extract/emails/v2/:directory', function (req, res) {
-    emails_v2(req.params.directory)
-        .then(data => res.send(data));
-    //res.send(200);
+app.post('/notify/mail', function (req, res) {
+    mailer.send(req.body.sub,req.body.msg,req.body.to);
+    res.send("success");
 })
 
 /**-----------------------------------------------------------------------------

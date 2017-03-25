@@ -41,15 +41,13 @@ html
     head
         meta(name="viewport" content="width=device-width, initial-scale=1, max-scale=1")/
         link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")/
-        script(type="text/javascript", src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js")
-        script(type="text/javascript", src="extract.js")
         title Extraction Page
         body
             div.main
                 h3 Esomar Extraction
                 a(href="/esomar/extract-companies") Extract Companies
                 br
-                a(href="/esomar/extract-emails") Extract Email
+                a(href="/extract-emails?dir=esomar") Extract Email
                 br
                 a(href="/esomar/download") Download Companies
                 br
@@ -59,7 +57,7 @@ html
                 h3 Greenbook Extraction
                 a(href="/greenbook/extract-companies") Extract Companies
                 br
-                a(href="/greenbook/extract-emails") Extract Email
+                a(href="/extract-emails?dir=greenbook") Extract Email
                 br
                 a(href="/greenbook/download") Download Companies
                 br
