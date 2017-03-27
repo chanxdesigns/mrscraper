@@ -126,10 +126,17 @@ app.get('/:directory/download', function (req, res) {
  * Download Emails List CSV File
  */
 app.get('/:directory/download/emails', function (req, res) {
-    emails_csv(req.params.directory, function (file_url) {
+    emails_csv.generateEmailsCsv(req.params.directory, function (file_url) {
         var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="' + file_url + '">Download</a>';
         res.send(html);
     })
+})
+
+app.get('/:directory/emails/website', function (req, res) {
+    emails_csv.carbonCopy(req.params.directory, function (file_url) {
+        var html = '<a style="margin: 50px 0 0 20px;text-decoration: none;padding: 10px 20px;background: #2ECC71; border-radius: 4px;color: white;font-family: Helvetica, Arial, sans-serif;text-align: center;" href="' + file_url + '">Download</a>';
+        res.send(html);
+    });
 })
 
 /**

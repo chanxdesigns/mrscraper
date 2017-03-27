@@ -35,7 +35,7 @@ var hunter = {
             .then(api => {
                 return $.get('https://api.hunter.io/v2/account/?api_key='+api.key)
                     .then(user => {
-                        if (user.data.calls.used >= user.data.calls.available) {
+                        if (user.data.calls.available <= user.data.calls.used) {
                             return hunter.setHunterApiKeys(api)
                                 .then(() => {
                                     return hunter.getHunterApiKeys()
@@ -78,6 +78,7 @@ getCompanies(location.search.substr(1).split('=')[1])
             if (company.company_url !== "404") {
                 return hunter.getHunterApiKeys()
                     .then(api => {
+                        console.log(api);
                         return checkForAvailability(company, location.search.substr(1).split('=')[1])
                             .then(data => {
                                 if (!data) {
