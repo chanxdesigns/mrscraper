@@ -35,8 +35,8 @@ function generate (dir, callback) {
             fs.writeFile('files/companies_'+ date +'.csv', csv, function(err) {
                 if (err) throw err;
                 var clientOptions = {
-                    accessKeyId: "AKIAJFBO2N5FZEARJXYA",
-                    secretAccessKey: "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",
+                    accessKeyId: "AKIAJY5OAW4EMSPQPTQA",
+                    secretAccessKey: "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",
                     region: 'ap-south-1'
                 };
                 var s3 = new AWS.S3(clientOptions);
