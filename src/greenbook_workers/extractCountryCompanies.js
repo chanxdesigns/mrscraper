@@ -15,10 +15,12 @@ function extractCountryCompanies (countries_page) {
 
                 articles.forEach(function (article) {
                     var $ = cheerio.load(article);
-                    companies_list.push({
-                        country: country_page.country,
-                        company_gb_url: 'https://www.greenbook.org/' + ($('a').first().attr('href').substr(1))
-                    });
+                    if ($('a').first().attr('href')) {
+                        companies_list.push({
+                            country: country_page.country,
+                            company_gb_url: 'https://www.greenbook.org/' + ($('a').first().attr('href').substr(1))
+                        });
+                    }
                 });
                 --counter;
                 console.log(counter);
