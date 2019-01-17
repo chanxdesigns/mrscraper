@@ -1,5 +1,5 @@
 const request = require('request-promise');
-const db_name = 'heroku_5lpx8nq1';
+const db_name = 'heroku_9rb65rmg';
 const mongodbUri = `https://api.mlab.com/api/1/databases/`;
 const long = require('longjohn');
 
