@@ -12,13 +12,19 @@ function extractCompanyDetails(pages) {
                 var $ = cheerio.load(body);
                 var name = $('.details-top').find('h1').text();
                 var input = $($('#companycontactstable2 tr').children()[2]).text();
-                var url = input.match(/(https?:\/\/[^ ]*)/)[0];
-                company_details.push({
-                    country: 'Bluebook',
-                    directory: 'Bluebook',
-                    company_name: name,
-                    company_url: url ? url : '404'
-                });
+                // console.log(input);
+                var url = input.match(/(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/igm);
+
+                if (url && url.length) {
+                    company_details.push({
+                        country: 'Bluebook',
+                        directory: 'Bluebook',
+                        company_name: name,
+                        company_url: url[0]
+                    });
+
+                    console.log(name, url);
+                }
 
                 --counter;
                 if (!counter) storeToDb(company_details, function () {
