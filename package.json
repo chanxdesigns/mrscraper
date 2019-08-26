@@ -4,6 +4,7 @@
   "description": "The Company Details Extractor for the C-Research Group",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Chanx Singha <chanx.designs@gmail.com>",
@@ -21,6 +22,7 @@
     "express": "^4.14.0",
     "json2csv": "^3.7.3",
     "mongoose": "^4.8.1",
+    "nodemon": "^1.19.1",
     "pug": "^0.1.0",
     "request": "^2.79.0",
     "request-promise": "^4.1.1",
