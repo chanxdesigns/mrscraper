@@ -3,6 +3,7 @@ var mongoose = require('mongoose'),
     Mailer = require('./mailer');
 
 function storeCompaniesData (datas, cb) {
+    console.log(datas);
     if (datas) {
         // Create Companies Model
         var CompaniesCollection = mongoose.model('Companies', DB.companySchema),
@@ -21,7 +22,7 @@ function storeCompaniesData (datas, cb) {
                             --counter;
                             console.log('Saving Now: '+counter);
                             if (!counter) {
-                                Mailer.send(data.directory + ' ' + data.country + ' Companies Storage Complete', 'Company extraction of '+ data.directory+' Directory Complete. You may now complete extracting email by visiting http://mrscraper.heroku.com/greenbook/extract-emails', 'chppal50@gmail.com');
+                                // Mailer.send(data.directory + ' ' + data.country + ' Companies Storage Complete', 'Company extraction of '+ data.directory+' Directory Complete. You may now complete extracting email by visiting http://mrscraper.heroku.com/greenbook/extract-emails', 'chppal50@gmail.com');
                                 cb();
                             }
                         });
@@ -29,7 +30,7 @@ function storeCompaniesData (datas, cb) {
                     else {
                         --counter;
                         if (!counter) {
-                            Mailer.send(data.directory + ' ' + data.country + ' Companies Storage Complete', 'Company extraction of '+ data.directory+' Directory Complete. You may now complete extracting email by visiting http://mrscraper.heroku.com/greenbook/extract-emails', 'chppal50@gmail.com');
+                            // Mailer.send(data.directory + ' ' + data.country + ' Companies Storage Complete', 'Company extraction of '+ data.directory+' Directory Complete. You may now complete extracting email by visiting http://mrscraper.heroku.com/greenbook/extract-emails', 'chppal50@gmail.com');
                             cb();
                         }
                     }
