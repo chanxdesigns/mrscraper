@@ -10,6 +10,7 @@ var express = require('express'),
     DB = require('./src/misc_workers/dbconn'),
     bluebook = require('./src/bluebook_scraper'),
     greenbook = require('./src/greenbook_scraper'),
+    esomar = require('./src/esomar_scraper'),
     store_comp = require('./src/misc_workers/store_companies'),
     emails = require('./src/misc_workers/extract_emails'),
     emails_v2 = require('./src/extract_mail_v2'),
@@ -66,6 +67,10 @@ app.get('/bluebook/extract-email', function (req, res) {
         .then(function (length) {
             res.json(length)
         });
+});
+
+app.get('/esomar/extract-companies', function (req, res) {
+    esomar.countries();
 });
 
 /**
