@@ -21,7 +21,7 @@
     "emailjs": "^1.0.8",
     "express": "^4.14.0",
     "json2csv": "^3.7.3",
-    "mongoose": "^4.8.1",
+    "mongoose": "^5.7.7",
     "nodemon": "^1.19.1",
     "pug": "^0.1.0",
     "request": "^2.79.0",
